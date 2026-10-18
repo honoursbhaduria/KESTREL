@@ -1,0 +1,13 @@
+node_modules
+.output
+dist
+.tanstack
+.vinxi
+src/routeTree.gen.ts
+
+# Scraped reference material (local research only, never shipped)
+reference/
+
+# Local screenshots
+image.png
+.vercel

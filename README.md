@@ -1,0 +1,105 @@
+# Kestrel — marketing site
+
+An original marketing site for a fictional AI design-review agent. The structure and interaction patterns
+were studied from an award-winning SaaS landing page. All branding, copy and visuals here are original:
+the illustrations are procedural (canvas, SVG and CSS), and no third-party assets are used.
+
+## Stack
+
+- **TanStack Start** (React 19, SSR, file-based routing via TanStack Router)
+- **Vite 8**, TypeScript (strict)
+- **GSAP 3 + ScrollTrigger** for scroll choreography
+- **Lenis** for smooth scrolling, driven by the GSAP ticker
+
+## Scripts
+
+```bash
+npm install
+npm run dev        # http://localhost:3000 (Vite picks the next free port if taken)
+npm run build      # client + SSR bundles in dist/
+npm run start      # preview the production build
+npm run typecheck
+```
+
+## Structure
+
+```
+src/
+  router.tsx                 getRouter() — TanStack Start entry
+  routes/
+    __root.tsx               document shell, <head>, global layout
+    index.tsx                home: composes the sections below
+    product.tsx              product page: hero, key features, how it works, FAQ
+    pricing.tsx              plans with monthly/yearly toggle, billing FAQ
+    about.tsx privacy.tsx terms.tsx
+  components/
+    layout/                  Header, Footer, Preloader, Cursor, Frame, CookieBanner, SmoothScroll
+    sections/                Hero, Intro, Problem, Statement, Review, Platform, Assemble, Why, UseCases, Faq, Cta
+    product/                 ProductHero, KeyFeatures, HowItWorks
+    ui/                      Button (rolling label), SplitText, Logo, Label, Iso (procedural art), InfoBox, Ruler, Legal
+    NotFound.tsx             animated 404
+  hooks/
+    useGsap.ts               gsap.context scoped to a component, reverted on unmount
+    useSplitReveal.ts        shared heading/fade-up scroll reveals
+    usePerView.ts            responsive cells-per-view for the partner/tool carousels
+  lib/
+    planCanvas.ts            hero floor-plan renderer + drag-to-scan lens
+    ready.ts                 sticky "preloader finished" signal
+    gsap.ts                  plugin registration + reduced-motion helper
+  styles/app.css             design tokens and all component styles
+```
+
+## Section → interaction map
+
+| Section   | Interaction |
+|-----------|-------------|
+| Preloader | Logo stroke draw, 000→100 counter, clip-path wipe |
+| Hero      | Canvas floor plan. Drag (or focus + arrow keys) to sweep a scan lens; issues reveal with live coordinates |
+| Intro     | Scroll-scrubbed word highlight, CSS marquee |
+| Problem   | Pinned horizontal card track with progress bar (desktop); stacked on mobile |
+| Assemble  | Sticky isometric building assembles on scroll, four counters tick up phase by phase (plays once on mobile) |
+| Platform  | Clip-path image reveals, staggered UI mock content |
+| Why       | Pinned 4-step stepper driving a state-based illustration |
+| Use cases | Accessible accordion with crossfading art |
+| CTA       | Validated email form (no backend; wire to a server function) |
+| Product hero | Plan art scales in, chat panel slides in, tool carousel with prev/next |
+| Key features | Sticky tab list tracks the feature in view; title words brighten with scroll |
+| How it works | Dashed connector draws, isometric icons rise |
+| FAQ       | Single-open accordion (shared `.acc` styles) |
+| Pricing   | Monthly/yearly toggle swaps prices |
+
+## Content & branding
+
+All landing-page copy, links and image slots live in **`src/content/site.ts`**. Nothing in the
+components is hardcoded, so rebranding is a content edit, not a code change.
+
+| Slot | Where it shows | Notes |
+|------|----------------|-------|
+| `brand.name`, `brand.logo`, `brand.email` | header, footer, page titles | logo: SVG under `public/assets/` |
+| `hero.image` | hero drawing | use a **1000 × 520** (1.92 : 1) image so `hero.issues` markers line up; the scan lens and crosshair draw over it |
+| `hero.issues` | drag-to-scan markers | `x`/`y` in the 1000 × 520 box |
+| `intro.image`, `intro.partners[].logo` | intro panel, partner slider | |
+| `problems[].image` | problem cards | replaces the isometric icon |
+| `review.image` | blueprint panel | **600 × 520** box; `review.violations` markers sit on top |
+| `platform.products[].image` | product rows | replaces the UI mock |
+| `useCases.items[].image` | use-case panel | |
+
+Any slot left `undefined` falls back to the built-in procedural artwork.
+
+Only put text and images here that you own or have written permission to use. Material in
+`reference/` is scraped for research and must not be copied in without that permission.
+
+## Motion system
+
+- `src/lib/motion.ts`: shared eases/durations (power2.out · 0.8s · 0.02 stagger for reveals; power3 1s and expo.out 1.6s for larger moves; stepped 19-frame / 0.58s fills), measured from the reference site's runtime log.
+- `public/mask-dither.svg` (generated by `tools/make-dither-mask.mjs`): 20-frame ordered-dither sprite used as a CSS mask for stepped button/cell fills.
+- `src/components/layout/PageTransition.tsx`: Barba-style leave → swap → enter on top of TanStack Router. Internal links get the full cover; back/forward gets the enter half.
+- `src/lib/ready.ts`: `whenPageVisible()` delays reveals until the preloader or transition cover is gone.
+- `tools/scrape-reference.mjs` (`npm run scrape:reference`): local reference gallery + animation inventory for research. Output in `reference/` is gitignored and never shipped.
+
+## Accessibility & quality
+
+- Semantic landmarks, skip link, `aria-label`ed split headings, `aria-expanded` menus, Escape closes menus
+- Keyboard-operable hero canvas and accordion; visible focus styles
+- `prefers-reduced-motion` disables Lenis, the preloader and scroll animations
+- Custom cursor only on fine pointers; no-JS fallback hides the loader
