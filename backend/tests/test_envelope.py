@@ -61,7 +61,7 @@ def test_pure_envelope_rectangle_plot():
     # Footprint area = 12000 * 15000 = 180,000,000 mm2 (180 sqm)
     assert env.footprint_area_mm2 == pytest.approx(180000000.0, rel=1e-2)
     assert env.max_coverage_mm2 == pytest.approx(180000000.0, rel=1e-2)  # 60% of 300 sqm
-    assert env.max_builtup_mm2 == pytest.approx(450000000.0, rel=1e-2)   # 300 sqm * 1.5 FAR
+    assert env.max_builtup_mm2 == pytest.approx(450000000.0, rel=1e-2)  # 300 sqm * 1.5 FAR
     assert env.max_height_mm == 15000.0
     assert env.max_floors == 4
     assert len(env.applied_rules) >= 4

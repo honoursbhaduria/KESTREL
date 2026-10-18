@@ -150,7 +150,11 @@ def compute_envelope(
             max_dist = d
             furthest_edge = i
 
-    rear_edge = furthest_edge if furthest_edge is not None else (primary_front_edge + n_vertices // 2) % n_vertices
+    rear_edge = (
+        furthest_edge
+        if furthest_edge is not None
+        else (primary_front_edge + n_vertices // 2) % n_vertices
+    )
 
     # Apply per-edge inward setbacks using negative buffer with edge-specific exclusion strips
     min_setback = min(front_setback, rear_setback, side_setback)

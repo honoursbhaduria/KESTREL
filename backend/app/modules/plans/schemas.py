@@ -1,7 +1,8 @@
 """Core Plan schemas and spatial validation invariants (Phase 3)."""
 
-from typing import Any, Literal
 import math
+from typing import Any, Literal
+
 from pydantic import BaseModel, Field, field_validator, model_validator
 from shapely.geometry import Polygon
 
@@ -21,7 +22,9 @@ class Room(BaseModel):
             raise ValueError("Room polygon must have at least 3 vertices.")
         poly = Polygon(v)
         if not poly.is_valid:
-            raise ValueError(f"Room polygon is topologically invalid (self-intersecting or degenerate).")
+            raise ValueError(
+                "Room polygon is topologically invalid (self-intersecting or degenerate)."
+            )
         if poly.area <= 0:
             raise ValueError("Room polygon area must be greater than zero.")
         return v
@@ -103,7 +106,9 @@ class Level(BaseModel):
             wall = walls_by_id.get(op.wall_id)
             if wall is not None:
                 if op.offset_mm < 0:
-                    raise ValueError(f"Opening {op.id} offset ({op.offset_mm} mm) cannot be negative.")
+                    raise ValueError(
+                        f"Opening {op.id} offset ({op.offset_mm} mm) cannot be negative."
+                    )
                 # Allow 1.0mm tolerance for floating point calculations
                 if op.offset_mm + op.width_mm > wall.length_mm + 1.0:
                     raise ValueError(
@@ -146,3 +151,39 @@ class PlanSummary(BaseModel):
     current_version: int
     created_at: str
     updated_at: str
+
+
+class PlanCreate(BaseModel):
+    name: str
+    data: PlanData | dict[str, Any]
+    message: str = "Initial plan creation"
+
+
+class PlanResponse(BaseModel):
+    id: str
+    project_id: str
+    name: str
+    current_version: int
+    data: PlanData
+    created_at: str
+    updated_at: str
+
+
+class ApplyPatchesRequest(BaseModel):
+    message: str = ""
+    created_by: str = "user"
+    patches: list[dict[str, Any]]
+
+
+class PlanVersionResponse(BaseModel):
+    id: str
+    plan_id: str
+    version: int
+    parent_version: int | None = None
+    created_by: str
+    message: str
+    created_at: str
+
+
+class ReviewPlanRequest(BaseModel):
+    ruleset_id: str | None = None

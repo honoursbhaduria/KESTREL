@@ -82,7 +82,7 @@ export function Header() {
           <span className="menu-btn__icon" aria-hidden="true"><span /><span /><span /></span>
         </button>
 
-        {/* Mobile: a stack of cells dropping from the menu cell */}
+        {/* Mobile: Full-width responsive navigation drawer */}
         <nav className={`mobile-menu${mobile ? ' is-open' : ''}`} id="mobile-menu" aria-label="Mobile" aria-hidden={!mobile}>
           <ul>
             {NAV.map((item) => ('children' in item ? { label: item.label, href: item.children[0].href, sub: true } : { ...item, sub: false })).map((item, i) => (
@@ -93,7 +93,23 @@ export function Header() {
                 </NavLink>
               </li>
             ))}
-            <li className="mobile-menu__cta" style={{ '--i': NAV.length } as React.CSSProperties}>
+            <li style={{ '--i': NAV.length } as React.CSSProperties}>
+              <NavLink href="/pricing" onClick={close} className="mobile-menu__link mono">
+                <span>Pricing</span>
+              </NavLink>
+            </li>
+            <li style={{ '--i': NAV.length + 1 } as React.CSSProperties}>
+              <NavLink href="/projects" onClick={close} className="mobile-menu__link mono">
+                <span>Projects Workspace</span>
+                <span className="nav__corner" aria-hidden="true" />
+              </NavLink>
+            </li>
+            <li style={{ '--i': NAV.length + 2 } as React.CSSProperties}>
+              <NavLink href="/login" onClick={close} className="mobile-menu__link mono">
+                <span>Sign In</span>
+              </NavLink>
+            </li>
+            <li className="mobile-menu__cta" style={{ '--i': NAV.length + 3 } as React.CSSProperties}>
               <a href={navCta.href} onClick={close} className="mobile-menu__link mono">
                 <span>{navCta.label}</span><Arrow />
               </a>

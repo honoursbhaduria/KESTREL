@@ -63,10 +63,25 @@ export function Preloader() {
 
     const finish = () => {
       document.documentElement.classList.remove('is-loading')
+      try { sessionStorage.setItem('kestrel_loaded', '1') } catch {}
       markAppReady()
       setDone(true)
     }
     if (prefersReducedMotion()) { finish(); return }
+
+    if (typeof window !== 'undefined') {
+      const isHome = window.location.pathname === '/' || window.location.pathname === ''
+      try {
+        if (!isHome || sessionStorage.getItem('kestrel_loaded')) {
+          finish()
+          return
+        }
+      } catch {}
+    }
+
+    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 899
+    // Safety fallback so mobile or slow networks never get stuck
+    const safetyTimer = setTimeout(finish, isMobile ? 2200 : 7000)
 
     const ctx = gsap.context(() => {
       const pct = el.querySelector<HTMLElement>('.pl__pct')!
@@ -79,14 +94,18 @@ export function Preloader() {
       gsap.set(lines, { autoAlpha: 0 })
       gsap.set('.pl__title .pl__ln > span', TEXT_FROM)
 
-      // Two-phase progress curve: quick to 60%, then eases into 100%
-      const LOAD = 5.5
-      const tl = gsap.timeline({ onComplete: finish })
-      tl.to('.pl__title .pl__ln > span', { ...TEXT_TO, stagger: 0.06 }, 0.1)
+      const LOAD = isMobile ? 1.1 : 4.5
+      const tl = gsap.timeline({
+        onComplete: () => {
+          clearTimeout(safetyTimer)
+          finish()
+        },
+      })
+      tl.to('.pl__title .pl__ln > span', { ...TEXT_TO, stagger: isMobile ? 0.03 : 0.06 }, 0.05)
         .to(progress, {
           keyframes: [
-            { v: 60, duration: 3, ease: 'power2.out' },
-            { v: 100, duration: 2.5, ease: 'power3.out' },
+            { v: 60, duration: isMobile ? 0.6 : 2.4, ease: 'power2.out' },
+            { v: 100, duration: isMobile ? 0.5 : 2.1, ease: 'power3.out' },
           ],
           onUpdate: () => {
             pct.textContent = `${Math.round(progress.v)}%`
@@ -94,27 +113,30 @@ export function Preloader() {
           },
         }, 0)
         // Wireframe traces along with the scan
-        .to(paths, { strokeDashoffset: 0, duration: DUR, ease: EASE, stagger: { amount: LOAD - 1.2 } }, 0.2)
+        .to(paths, { strokeDashoffset: 0, duration: isMobile ? 0.8 : DUR, ease: EASE, stagger: { amount: isMobile ? 0.4 : LOAD - 1.2 } }, 0.1)
         // Spec sheet and boot log lines fade in one after another
-        .to(lines, { autoAlpha: 1, duration: 0.25, ease: 'power3.out', stagger: 0.3 }, 0.4)
+        .to(lines, { autoAlpha: 1, duration: 0.2, ease: 'power3.out', stagger: isMobile ? 0.1 : 0.3 }, 0.2)
 
       // Scan line splits into two guides that frame the building
-      const T = LOAD + 0.1
-      tl.to('.pl__pct', { autoAlpha: 0, duration: 0.2 }, T)
+      const T = LOAD + 0.05
+      tl.to('.pl__pct', { autoAlpha: 0, duration: 0.15 }, T)
         .set('.pl__scan', { autoAlpha: 0 }, T)
         .set('.pl__guide', { autoAlpha: 1 }, T)
-        .to('.pl__guide--top', { y: () => -guideTravel() * 0.42, duration: DUR, ease: EASE_IN_OUT }, T)
-        .to('.pl__guide--bot', { y: () => guideTravel() * 0.36, duration: DUR, ease: EASE_IN_OUT }, T)
+        .to('.pl__guide--top', { y: () => -guideTravel() * 0.42, duration: isMobile ? 0.4 : DUR, ease: EASE_IN_OUT }, T)
+        .to('.pl__guide--bot', { y: () => guideTravel() * 0.36, duration: isMobile ? 0.4 : DUR, ease: EASE_IN_OUT }, T)
         // Copy leaves, paper dissolves, hero takes over underneath
-        .to('.pl__title .pl__ln > span', { yPercent: -100, autoAlpha: 0, duration: 0.5, ease: 'power2.in', stagger: STAGGER_TEXT }, T + 0.5)
-        .to('.pl__meta', { autoAlpha: 0, duration: 0.4, ease: EASE }, T + 0.5)
-        .to('.pl__guide', { scaleX: 0, transformOrigin: 'right', duration: DUR, ease: EASE_IN_OUT, stagger: 0.06 }, T + 0.8)
-        .to(el, { backgroundColor: 'rgba(243,242,238,0)', duration: 0.6, ease: EASE }, T + 0.9)
-        .call(() => { document.documentElement.classList.remove('is-loading'); markAppReady() }, [], T + 0.9)
-        .to('.pl__wire', { autoAlpha: 0, duration: DUR, ease: EASE }, T + 1.3)
+        .to('.pl__title .pl__ln > span', { yPercent: -100, autoAlpha: 0, duration: isMobile ? 0.3 : 0.5, ease: 'power2.in', stagger: STAGGER_TEXT }, T + (isMobile ? 0.2 : 0.5))
+        .to('.pl__meta', { autoAlpha: 0, duration: 0.3, ease: EASE }, T + (isMobile ? 0.2 : 0.5))
+        .to('.pl__guide', { scaleX: 0, transformOrigin: 'right', duration: isMobile ? 0.4 : DUR, ease: EASE_IN_OUT, stagger: 0.04 }, T + (isMobile ? 0.35 : 0.8))
+        .to(el, { backgroundColor: 'rgba(243,242,238,0)', duration: isMobile ? 0.35 : 0.6, ease: EASE }, T + (isMobile ? 0.4 : 0.9))
+        .call(() => { document.documentElement.classList.remove('is-loading'); markAppReady() }, [], T + (isMobile ? 0.4 : 0.9))
+        .to('.pl__wire', { autoAlpha: 0, duration: isMobile ? 0.4 : DUR, ease: EASE }, T + (isMobile ? 0.5 : 1.3))
     }, el)
 
-    return () => ctx.revert()
+    return () => {
+      clearTimeout(safetyTimer)
+      ctx.revert()
+    }
   }, [])
 
   if (done) return null

@@ -1,12 +1,14 @@
 """Pure rule engine checkers for architectural plan verification (Phase 3)."""
 
-from typing import Any, Callable, Literal
 import math
+from collections.abc import Callable
+from typing import Any, Literal
+
 from pydantic import BaseModel, Field
 from shapely.geometry import Point, Polygon
 
 from app.modules.planning.envelope import Envelope
-from app.modules.plans.schemas import PlanData, Room
+from app.modules.plans.schemas import PlanData
 from app.modules.rules.schemas import RuleDefinition
 
 
@@ -58,15 +60,29 @@ def check_min_room_area(
     issues: list[Issue] = []
     params = rule.params
     target_type = params.get("room_type")
+    if not target_type and rule.applies_to and rule.applies_to.startswith("room:"):
+        target_type = rule.applies_to.split(":", 1)[1]
+
     min_area_sqm = float(params.get("min_area_sqm", 9.5))
 
     for lvl in plan.levels:
         for r in lvl.rooms:
             # If target_type specified, check matching type; otherwise check habitable rooms
-            if target_type and r.type != target_type:
-                continue
-            if not target_type and r.type not in ["bedroom", "living", "habitable", "study"]:
-                continue
+            if target_type == "habitable" or (
+                not target_type and rule.applies_to in ["room", "room:habitable"]
+            ):
+                if r.type not in ["bedroom", "living", "habitable", "study"]:
+                    continue
+            elif target_type:
+                if target_type in ["bathroom", "bath"] and r.type not in ["bathroom", "bath"]:
+                    continue
+                elif target_type in ["wc", "water_closet"] and r.type not in ["wc", "water_closet"]:
+                    continue
+                elif (
+                    target_type not in ["bathroom", "bath", "wc", "water_closet"]
+                    and r.type != target_type
+                ):
+                    continue
 
             area_sqm = r.area_sqm
             passed = area_sqm >= (min_area_sqm - 0.05)
@@ -100,13 +116,29 @@ def check_min_room_width(
     """Check that room clear width satisfies statutory minima."""
     issues: list[Issue] = []
     params = rule.params
-    target_type = params.get("room_type", "kitchen")
+    target_type = params.get("room_type")
+    if not target_type and rule.applies_to and rule.applies_to.startswith("room:"):
+        target_type = rule.applies_to.split(":", 1)[1]
+
     min_width_mm = float(params.get("min_width_mm", 1800.0))
 
     for lvl in plan.levels:
         for r in lvl.rooms:
-            if target_type and r.type != target_type:
-                continue
+            if target_type == "habitable" or (
+                not target_type and rule.applies_to in ["room", "room:habitable"]
+            ):
+                if r.type not in ["bedroom", "living", "habitable", "study"]:
+                    continue
+            elif target_type:
+                if target_type in ["bathroom", "bath"] and r.type not in ["bathroom", "bath"]:
+                    continue
+                elif target_type in ["wc", "water_closet"] and r.type not in ["wc", "water_closet"]:
+                    continue
+                elif (
+                    target_type not in ["bathroom", "bath", "wc", "water_closet"]
+                    and r.type != target_type
+                ):
+                    continue
 
             # Compute bounding box dimension as width heuristic
             xs = [p[0] for p in r.polygon]
@@ -114,7 +146,6 @@ def check_min_room_width(
             w = max(xs) - min(xs)
             h = max(ys) - min(ys)
             min_dim_mm = min(w, h)
-
             passed = min_dim_mm >= (min_width_mm - 5.0)
             st = _status(rule, passed)
 
@@ -288,7 +319,9 @@ def check_window_to_floor_ratio(
 ) -> list[Issue]:
     """Check that aggregate window area provides at least 1/8 (12.5%) ventilation area."""
     issues: list[Issue] = []
-    min_ratio = float(rule.params.get("min_ratio", 0.125))
+    min_ratio = float(
+        rule.params.get("min_ratio") or rule.params.get("min_opening_floor_ratio") or 0.10
+    )
 
     for lvl in plan.levels:
         for r in lvl.rooms:
@@ -374,7 +407,9 @@ def check_inside_envelope(
             category=rule.category,
             status=st,
             element_ids=protruding_rooms,
-            measured=f"{len(protruding_rooms)} elements outside" if not passed else "0 elements outside",
+            measured=f"{len(protruding_rooms)} elements outside"
+            if not passed
+            else "0 elements outside",
             required="All elements inside envelope",
             message=(
                 "All ground floor rooms and external walls are strictly contained within the buildable envelope."
@@ -426,9 +461,7 @@ def check_ground_coverage(
 
 
 @checker("far", depends_on=["envelope", "room", "level"])
-def check_far(
-    plan: PlanData, envelope: Envelope | None, rule: RuleDefinition
-) -> list[Issue]:
+def check_far(plan: PlanData, envelope: Envelope | None, rule: RuleDefinition) -> list[Issue]:
     """Check that total built-up area across all levels does not exceed FAR limits."""
     issues: list[Issue] = []
     if not envelope:
@@ -458,3 +491,14 @@ def check_far(
         )
     )
     return issues
+
+
+# Ruleset checker aliases mapping standard ruleset YAML check names to checker functions
+CHECKER_REGISTRY["check_room_min_area"] = CHECKER_REGISTRY["min_room_area"]
+CHECKER_REGISTRY["check_room_min_width"] = CHECKER_REGISTRY["min_room_width"]
+CHECKER_REGISTRY["check_room_min_height"] = CHECKER_REGISTRY["min_ceiling_height"]
+CHECKER_REGISTRY["check_stair_geometry"] = CHECKER_REGISTRY["stair_riser_tread"]
+CHECKER_REGISTRY["check_ventilation_ratio"] = CHECKER_REGISTRY["window_to_floor_ratio"]
+CHECKER_REGISTRY["check_setbacks"] = CHECKER_REGISTRY["inside_envelope"]
+CHECKER_REGISTRY["check_coverage"] = CHECKER_REGISTRY["ground_coverage"]
+CHECKER_REGISTRY["check_far"] = CHECKER_REGISTRY["far"]

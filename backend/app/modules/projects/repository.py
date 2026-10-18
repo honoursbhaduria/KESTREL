@@ -16,9 +16,7 @@ class ProjectRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_by_id(
-        self, project_id: uuid.UUID, org_id: uuid.UUID
-    ) -> Project | None:
+    async def get_by_id(self, project_id: uuid.UUID, org_id: uuid.UUID) -> Project | None:
         """Fetch project scoped strictly by org_id."""
         stmt = (
             select(Project)
@@ -35,9 +33,7 @@ class ProjectRepository:
         self, org_id: uuid.UUID, skip: int = 0, limit: int = 100
     ) -> tuple[list[Project], int]:
         """List all projects belonging to the given organization."""
-        count_stmt = (
-            select(func.count()).select_from(Project).where(Project.org_id == org_id)
-        )
+        count_stmt = select(func.count()).select_from(Project).where(Project.org_id == org_id)
         total = await self.session.scalar(count_stmt) or 0
 
         stmt = (
@@ -51,9 +47,7 @@ class ProjectRepository:
         items = list(res.scalars().all())
         return items, total
 
-    async def create(
-        self, org_id: uuid.UUID, name: str, description: str | None
-    ) -> Project:
+    async def create(self, org_id: uuid.UUID, name: str, description: str | None) -> Project:
         project = Project(
             org_id=org_id,
             name=name.strip(),

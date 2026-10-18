@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+
 import pytest
 from httpx import AsyncClient
 
@@ -14,7 +15,8 @@ def plan_2bhk_raw() -> dict:
 
 
 @pytest.mark.asyncio
-async def test_plans_api_lifecycle(client: AsyncClient, auth_headers: dict, plan_2bhk_raw: dict):
+async def test_plans_api_lifecycle(client: AsyncClient, auth_org_a: dict, plan_2bhk_raw: dict):
+    auth_headers = auth_org_a["headers"]
     # 1. Create a project
     create_proj_res = await client.post(
         "/api/v1/projects",
@@ -27,7 +29,11 @@ async def test_plans_api_lifecycle(client: AsyncClient, auth_headers: dict, plan
     # 2. Create initial plan
     create_plan_res = await client.post(
         f"/api/v1/projects/{project_id}/plans",
-        json={"name": "Ground Floor Scheme A", "data": plan_2bhk_raw, "message": "Initial scheme import"},
+        json={
+            "name": "Ground Floor Scheme A",
+            "data": plan_2bhk_raw,
+            "message": "Initial scheme import",
+        },
         headers=auth_headers,
     )
     assert create_plan_res.status_code == 201

@@ -45,13 +45,9 @@ class Plot(BaseModel):
     # Local metric coordinates [[x, y], ...] in mm
     boundary_coords: Mapped[list[list[float]]] = mapped_column(JSONB, nullable=False)
     # Original WGS84 coordinates if drawn on map [[lng, lat], ...]
-    original_geo_boundary: Mapped[list[list[float]] | None] = mapped_column(
-        JSONB, nullable=True
-    )
+    original_geo_boundary: Mapped[list[list[float]] | None] = mapped_column(JSONB, nullable=True)
     north_angle_deg: Mapped[float] = mapped_column(Float, default=0.0, nullable=False)
-    road_sides: Mapped[list[dict[str, Any]]] = mapped_column(
-        JSONB, default=list, nullable=False
-    )
+    road_sides: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, default=list, nullable=False)
     plot_area_mm2: Mapped[float] = mapped_column(Float, nullable=False)
 
     project: Mapped["Project"] = relationship("Project", back_populates="plot")

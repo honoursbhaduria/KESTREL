@@ -63,7 +63,9 @@ def load_all_rulesets(force_reload: bool = False) -> list[RulesetDefinition]:
         try:
             ruleset = load_ruleset_from_file(yaml_path)
             loaded[ruleset.id] = ruleset
-            logger.info("ruleset_loaded", id=ruleset.id, count=len(ruleset.rules), path=str(yaml_path))
+            logger.info(
+                "ruleset_loaded", id=ruleset.id, count=len(ruleset.rules), path=str(yaml_path)
+            )
         except Exception as e:
             logger.error("ruleset_load_error", path=str(yaml_path), error=str(e))
             raise

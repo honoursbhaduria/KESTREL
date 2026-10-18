@@ -10,11 +10,12 @@ When a wall is edited or moved via `MoveWallPatch`, connected room polygons must
    mesh rebuild.
 """
 
+from collections.abc import Sequence
 from typing import Any, Literal
-import copy
+
 from pydantic import BaseModel, Field
 
-from app.modules.plans.schemas import Level, Opening, PlanData, Room, Wall
+from app.modules.plans.schemas import Opening, PlanData
 
 
 class BasePatch(BaseModel):
@@ -54,8 +55,12 @@ class MoveWallPatch(BasePatch):
                         new_poly = []
                         for pt in room["polygon"]:
                             # If vertex was at old start or end (or on the wall segment)
-                            dist_to_start = ((pt[0] - old_start[0]) ** 2 + (pt[1] - old_start[1]) ** 2) ** 0.5
-                            dist_to_end = ((pt[0] - old_end[0]) ** 2 + (pt[1] - old_end[1]) ** 2) ** 0.5
+                            dist_to_start = (
+                                (pt[0] - old_start[0]) ** 2 + (pt[1] - old_start[1]) ** 2
+                            ) ** 0.5
+                            dist_to_end = (
+                                (pt[0] - old_end[0]) ** 2 + (pt[1] - old_end[1]) ** 2
+                            ) ** 0.5
                             if dist_to_start < 50.0 or dist_to_end < 50.0:
                                 new_poly.append([pt[0] + self.dx_mm, pt[1] + self.dy_mm])
                             else:
@@ -299,7 +304,7 @@ def parse_patch(patch_dict: dict[str, Any]) -> BasePatch:
     return patch_cls.model_validate(patch_dict)
 
 
-def apply_patches(plan: PlanData, patches: list[dict[str, Any] | BasePatch]) -> PlanData:
+def apply_patches(plan: PlanData, patches: Sequence[dict[str, Any] | BasePatch]) -> PlanData:
     """Apply a list of patches sequentially and atomically."""
     current = plan
     for p in patches:
@@ -341,7 +346,9 @@ def compute_plan_diff(plan_a: PlanData, plan_b: PlanData) -> PlanDiff:
         else:
             wb = walls_b[wid]
             if wa.model_dump() != wb.model_dump():
-                diff.modified_walls.append({"id": wid, "before": wa.model_dump(), "after": wb.model_dump()})
+                diff.modified_walls.append(
+                    {"id": wid, "before": wa.model_dump(), "after": wb.model_dump()}
+                )
 
     for wid, wb in walls_b.items():
         if wid not in walls_a:
@@ -357,7 +364,9 @@ def compute_plan_diff(plan_a: PlanData, plan_b: PlanData) -> PlanDiff:
         else:
             ob = ops_b[oid]
             if oa.model_dump() != ob.model_dump():
-                diff.modified_openings.append({"id": oid, "before": oa.model_dump(), "after": ob.model_dump()})
+                diff.modified_openings.append(
+                    {"id": oid, "before": oa.model_dump(), "after": ob.model_dump()}
+                )
 
     for oid, ob in ops_b.items():
         if oid not in ops_a:
@@ -373,7 +382,9 @@ def compute_plan_diff(plan_a: PlanData, plan_b: PlanData) -> PlanDiff:
         else:
             rb = rooms_b[rid]
             if ra.model_dump() != rb.model_dump():
-                diff.modified_rooms.append({"id": rid, "before": ra.model_dump(), "after": rb.model_dump()})
+                diff.modified_rooms.append(
+                    {"id": rid, "before": ra.model_dump(), "after": rb.model_dump()}
+                )
 
     for rid, rb in rooms_b.items():
         if rid not in rooms_a:

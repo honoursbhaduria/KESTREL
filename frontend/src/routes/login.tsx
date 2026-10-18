@@ -10,8 +10,8 @@ import { Toast } from '~/components/shared/Toast'
 export const Route = createFileRoute('/login')({
   head: () => ({
     meta: [
-      { title: 'Login — Haron Architectural Platform' },
-      { name: 'description', content: 'Sign in to Haron AI Home Design Platform for Architects' },
+      { title: 'Login — Kestrel Architectural Platform' },
+      { name: 'description', content: 'Sign in to Kestrel AI Home Design Platform for Architects' },
     ],
   }),
   component: LoginPage,
@@ -46,7 +46,7 @@ function LoginPage() {
         <div className="flex items-center justify-between pb-3 border-b border-[var(--line)]">
           <Link to="/" className="font-sans font-bold text-xl uppercase flex items-center gap-2">
             <span className="w-3.5 h-3.5 bg-[var(--accent)] inline-block" />
-            HARON
+            KESTREL
           </Link>
           <BracketLabel text="AUTH · 01" />
         </div>

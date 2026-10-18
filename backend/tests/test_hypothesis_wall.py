@@ -2,8 +2,9 @@
 
 import json
 from pathlib import Path
-from hypothesis import given, settings
+
 import hypothesis.strategies as st
+from hypothesis import given, settings
 from shapely.geometry import Polygon
 
 from app.modules.plans.patches import MoveWallPatch

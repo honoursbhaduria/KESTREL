@@ -22,13 +22,13 @@ export const AppShell: React.FC<AppShellProps> = ({ children, currentTab = 'proj
     <div className="min-h-screen bg-[var(--paper)] text-[var(--ink)] flex flex-col pt-2 pb-4 px-2">
       {/* Top Drafting Bar */}
       <header
-        className="h-14 border border-[var(--line)] bg-[var(--paper)] flex items-center justify-between px-4 mb-2"
+        className="h-14 border border-[var(--line)] bg-[var(--paper)] flex items-center justify-between px-3 sm:px-4 mb-2"
         style={{ boxShadow: '0 2px 0 var(--ink)' }}
       >
-        <div className="flex items-center gap-4">
-          <Link to="/" className="font-sans font-bold text-lg tracking-tight uppercase flex items-center gap-2">
-            <span className="w-4 h-4 bg-[var(--accent)] inline-block" />
-            HARON <span className="font-mono text-[11px] font-normal text-[var(--ink-50)]">v0.1.0</span>
+        <div className="flex items-center gap-3 sm:gap-4">
+          <Link to="/" className="font-sans font-bold text-base sm:text-lg tracking-tight uppercase flex items-center gap-2">
+            <span className="w-3.5 h-3.5 sm:w-4 sm:h-4 bg-[var(--accent)] inline-block" />
+            KESTREL <span className="font-mono text-[10px] sm:text-[11px] font-normal text-[var(--ink-50)]">v0.1.0</span>
           </Link>
           <div className="h-4 w-[1px] bg-[var(--line)] hidden md:block" />
           {org && (
@@ -40,13 +40,13 @@ export const AppShell: React.FC<AppShellProps> = ({ children, currentTab = 'proj
           )}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           {user ? (
-            <div className="flex items-center gap-3 font-mono text-[11px]">
+            <div className="flex items-center gap-2 sm:gap-3 font-mono text-[11px]">
               <span className="hidden sm:inline text-[var(--ink-72)]">{user.full_name}</span>
               <button
                 onClick={handleLogout}
-                className="px-2 py-1 border border-[var(--line)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors uppercase text-[10.5px]"
+                className="px-2 py-1 border border-[var(--line)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors uppercase text-[10px] sm:text-[10.5px]"
               >
                 Logout
               </button>
@@ -55,13 +55,13 @@ export const AppShell: React.FC<AppShellProps> = ({ children, currentTab = 'proj
             <div className="flex items-center gap-2">
               <Link
                 to="/login"
-                className="font-mono text-[11px] px-3 py-1 border border-[var(--line)] uppercase hover:border-[var(--ink)]"
+                className="font-mono text-[10.5px] sm:text-[11px] px-2.5 sm:px-3 py-1 border border-[var(--line)] uppercase hover:border-[var(--ink)]"
               >
                 Login
               </Link>
               <Link
                 to="/register"
-                className="font-mono text-[11px] px-3 py-1 bg-[var(--accent)] text-white uppercase"
+                className="font-mono text-[10.5px] sm:text-[11px] px-2.5 sm:px-3 py-1 bg-[var(--accent)] text-white uppercase"
               >
                 Register
               </Link>
@@ -69,6 +69,28 @@ export const AppShell: React.FC<AppShellProps> = ({ children, currentTab = 'proj
           )}
         </div>
       </header>
+
+      {/* Mobile Navigation Strip */}
+      <nav className="flex md:hidden border border-[var(--line)] bg-[var(--paper)] mb-2 text-[11px] font-mono" style={{ boxShadow: '0 2px 0 var(--ink)' }}>
+        <Link
+          to="/projects"
+          className={`flex-1 text-center py-2 px-2 uppercase whitespace-nowrap ${currentTab === 'projects' ? 'bg-[var(--ink)] text-white font-bold' : 'text-[var(--ink-72)] hover:bg-[var(--paper-2)]'}`}
+        >
+          [01] Projects
+        </Link>
+        <Link
+          to="/pricing"
+          className="flex-1 text-center py-2 px-2 uppercase whitespace-nowrap text-[var(--ink-50)] hover:bg-[var(--paper-2)] border-l border-[var(--line)]"
+        >
+          [02] Plans
+        </Link>
+        <Link
+          to="/"
+          className="flex-1 text-center py-2 px-2 uppercase whitespace-nowrap text-[var(--ink-50)] hover:bg-[var(--paper-2)] border-l border-[var(--line)]"
+        >
+          [03] Site
+        </Link>
+      </nav>
 
       {/* Main Workspace Frame */}
       <div className="flex-1 flex gap-2">

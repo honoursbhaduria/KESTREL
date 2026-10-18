@@ -80,7 +80,9 @@ class SetPlotRequest(BaseModel):
             self.boundary = coords
 
         if not self.boundary:
-            raise ValueError("Either (width_mm and depth_mm) or a valid boundary polygon must be provided.")
+            raise ValueError(
+                "Either (width_mm and depth_mm) or a valid boundary polygon must be provided."
+            )
 
         coords = self.boundary
         # Auto-close if needed

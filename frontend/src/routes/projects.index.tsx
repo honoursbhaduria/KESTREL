@@ -13,7 +13,7 @@ import { Toast } from '~/components/shared/Toast'
 export const Route = createFileRoute('/projects/')({
   head: () => ({
     meta: [
-      { title: 'Projects — Haron Architectural Platform' },
+      { title: 'Projects — Kestrel Architectural Platform' },
       { name: 'description', content: 'Studio project workspace and active commissions' },
     ],
   }),

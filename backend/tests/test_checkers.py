@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+
 import pytest
 
 from app.modules.planning.envelope import Envelope
@@ -184,7 +185,9 @@ def test_window_to_floor_ratio_checker(plan_2bhk: PlanData, plan_violations: Pla
     assert len(fails) >= 1
 
 
-def test_inside_envelope_checker(plan_2bhk: PlanData, plan_violations: PlanData, sample_envelope: Envelope):
+def test_inside_envelope_checker(
+    plan_2bhk: PlanData, plan_violations: PlanData, sample_envelope: Envelope
+):
     rule = RuleDefinition(
         id="bylaws-inside-envelope",
         title="Building Footprint Inside Envelope",

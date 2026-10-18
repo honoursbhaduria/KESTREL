@@ -136,9 +136,7 @@ async def test_get_rulesets_endpoint(client: AsyncClient, auth_org_a: dict):
 @pytest.mark.asyncio
 async def test_get_ruleset_by_id_endpoint(client: AsyncClient, auth_org_a: dict):
     """GET /api/v1/rulesets/{id} returns full ruleset with all rules."""
-    resp = await client.get(
-        "/api/v1/rulesets/india-nbc-2016", headers=auth_org_a["headers"]
-    )
+    resp = await client.get("/api/v1/rulesets/india-nbc-2016", headers=auth_org_a["headers"])
     assert resp.status_code == 200
     data = resp.json()
 
@@ -186,9 +184,7 @@ async def test_set_project_ruleset_endpoint(client: AsyncClient, auth_org_a: dic
 
 
 @pytest.mark.asyncio
-async def test_ruleset_project_tenancy(
-    client: AsyncClient, auth_org_a: dict, auth_org_b: dict
-):
+async def test_ruleset_project_tenancy(client: AsyncClient, auth_org_a: dict, auth_org_b: dict):
     """Org B cannot set ruleset on Org A's project (404 Not Found)."""
     project_id = await create_test_project(client, auth_org_a["headers"])
 

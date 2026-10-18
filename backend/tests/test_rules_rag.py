@@ -7,9 +7,7 @@ from httpx import AsyncClient
 
 
 @pytest.mark.asyncio
-async def test_rule_chunk_ingestion_and_search(
-    client: AsyncClient, auth_org_a: dict, db_session
-):
+async def test_rule_chunk_ingestion_and_search(client: AsyncClient, auth_org_a: dict, db_session):
     """Ingesting source document chunks and searching via GET /api/v1/rules/search."""
     from app.modules.rules.rag import ingest_source_document
 

@@ -2,6 +2,7 @@
 
 import json
 from pathlib import Path
+
 import pytest
 
 from app.modules.planning.envelope import Envelope
@@ -57,11 +58,13 @@ def test_review_violations_fixture_returns_expected_issues(
 
     assert result.summary["fail_count"] >= 3
     rule_ids_flagged = {issue.rule_id for issue in result.issues if issue.status == "fail"}
-    assert "nbc-min-habitable-room" in rule_ids_flagged
-    assert "nbc-stair-max-riser" in rule_ids_flagged or "nbc-stair-min-tread" in rule_ids_flagged
+    assert "nbc-habitable-room-min-area" in rule_ids_flagged
+    assert "nbc-residential-stair-width" in rule_ids_flagged
 
 
-def test_incremental_review_filters_by_dependencies(plan_2bhk: PlanData, envelope_fixture: Envelope):
+def test_incremental_review_filters_by_dependencies(
+    plan_2bhk: PlanData, envelope_fixture: Envelope
+):
     """Incremental review only executes checkers matching modified element dependencies."""
     ruleset = get_ruleset("india-nbc-2016")
     engine = ReviewEngine()

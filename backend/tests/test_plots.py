@@ -90,9 +90,7 @@ async def test_put_plot_explicit_polygon_success(client: AsyncClient, auth_org_a
 
 
 @pytest.mark.asyncio
-async def test_put_plot_rejects_self_intersecting_polygon(
-    client: AsyncClient, auth_org_a: dict
-):
+async def test_put_plot_rejects_self_intersecting_polygon(client: AsyncClient, auth_org_a: dict):
     """Self-intersecting polygon (bowtie / figure 8) must be rejected with 422/400."""
     project_id = await create_test_project(client, auth_org_a["headers"])
 
@@ -121,9 +119,7 @@ async def test_put_plot_rejects_self_intersecting_polygon(
 
 
 @pytest.mark.asyncio
-async def test_put_plot_rejects_unclosed_polygon(
-    client: AsyncClient, auth_org_a: dict
-):
+async def test_put_plot_rejects_unclosed_polygon(client: AsyncClient, auth_org_a: dict):
     """Polygon where last coordinate != first coordinate must be auto-closed or validated."""
     project_id = await create_test_project(client, auth_org_a["headers"])
 
@@ -153,9 +149,7 @@ async def test_put_plot_rejects_unclosed_polygon(
 
 
 @pytest.mark.asyncio
-async def test_put_plot_rejects_fewer_than_3_vertices(
-    client: AsyncClient, auth_org_a: dict
-):
+async def test_put_plot_rejects_fewer_than_3_vertices(client: AsyncClient, auth_org_a: dict):
     """Plot with fewer than 3 unique vertices cannot form a 2D surface."""
     project_id = await create_test_project(client, auth_org_a["headers"])
 
@@ -222,9 +216,7 @@ async def test_get_plot_returns_persisted_plot(client: AsyncClient, auth_org_a: 
 
 
 @pytest.mark.asyncio
-async def test_plot_tenancy_isolation(
-    client: AsyncClient, auth_org_a: dict, auth_org_b: dict
-):
+async def test_plot_tenancy_isolation(client: AsyncClient, auth_org_a: dict, auth_org_b: dict):
     """Org B cannot read or update Org A's plot (must yield 404, not 403)."""
     project_id = await create_test_project(client, auth_org_a["headers"])
 

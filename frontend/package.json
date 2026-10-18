@@ -6,6 +6,7 @@
     "dev": "vite dev",
     "build": "vite build",
     "start": "vite preview",
+    "preview": "vite preview --port 3002 --host",
     "typecheck": "tsc --noEmit",
     "scrape:reference": "node tools/scrape-reference.mjs"
   },

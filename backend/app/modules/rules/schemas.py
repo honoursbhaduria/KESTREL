@@ -26,11 +26,17 @@ class RuleDefinition(BaseModel):
     title: str = Field(..., description="Human-readable rule title")
     clause: str = Field(..., description="Source legal document and clause/section reference")
     category: RuleCategory = Field(..., description="Rule category")
-    applies_to: str = Field(..., description="Target entity type (e.g. plot, building, room:habitable)")
+    applies_to: str = Field(
+        ..., description="Target entity type (e.g. plot, building, room:habitable)"
+    )
     check: str = Field(..., description="Checker function identifier")
-    params: dict[str, Any] = Field(default_factory=dict, description="Numerical parameters and thresholds")
+    params: dict[str, Any] = Field(
+        default_factory=dict, description="Numerical parameters and thresholds"
+    )
     severity: RuleSeverity = Field("fail", description="Violation severity: fail or review")
-    verified: bool = Field(..., description="Whether this rule is verified against official source text")
+    verified: bool = Field(
+        ..., description="Whether this rule is verified against official source text"
+    )
     notes: str = Field("", description="Source verification notes or TODO tags")
 
 

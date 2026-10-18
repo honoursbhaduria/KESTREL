@@ -51,9 +51,10 @@ export function ProductHero() {
 
   useGsap(ref, ({ reduced, el }) => {
     if (reduced) return
+    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 899
     const tl = gsap.timeline({ paused: true })
       .fromTo(el.querySelector('.phero__plan'), { scale: 1.06, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: DUR_SLOW, ease: EASE_SLOW })
-      .fromTo(el.querySelector('.phero__chat'), { x: 26, autoAlpha: 0 }, { x: 0, autoAlpha: 1, duration: DUR_BIG, ease: EASE_BIG }, 0.3)
+      .fromTo(el.querySelector('.phero__chat'), { x: isMobile ? 0 : 26, y: isMobile ? 16 : 0, autoAlpha: 0 }, { x: 0, y: 0, autoAlpha: 1, duration: DUR_BIG, ease: EASE_BIG }, 0.3)
       .fromTo(el.querySelectorAll('.phero__chat .mock__msg, .phero__chat .mock__actions'), { y: 10, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.5, stagger: 0.25 }, 0.7)
       .fromTo(el.querySelectorAll('.phero__tools > *'), { y: 26, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: DUR_BIG, ease: EASE_BIG, stagger: 0.06 }, 0.2)
     return whenPageVisible(() => tl.play())

@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 # Import all models for alembic autogenerate
 import app.modules.auth.models
 import app.modules.jobs.models
+import app.modules.plans.models
 import app.modules.projects.models
 import app.modules.rules.models
 from alembic import context

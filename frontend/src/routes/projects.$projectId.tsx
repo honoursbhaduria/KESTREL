@@ -8,6 +8,7 @@ import {
   type RulesetSummary,
   type RuleSearchResult,
 } from '~/api/client'
+import { PlanWorkspace } from '~/components/plan/PlanWorkspace'
 import { AppShell } from '~/components/layout/AppShell'
 import { Button } from '~/components/shared/Button'
 import { Card } from '~/components/shared/Card'
@@ -20,8 +21,8 @@ import { Toast } from '~/components/shared/Toast'
 export const Route = createFileRoute('/projects/$projectId')({
   head: () => ({
     meta: [
-      { title: 'Plot & Buildable Envelope — Haron Architectural Platform' },
-      { name: 'description', content: 'Spatial plot definition and legal buildable envelope calculation' },
+      { title: 'Plan Workspace & Spatial Envelope — Kestrel Architectural Platform' },
+      { name: 'description', content: '2D interactive plan drafting workspace, buildable envelope and statutory review' },
     ],
   }),
   component: ProjectPlotEnvelopePage,
@@ -35,8 +36,8 @@ function ProjectPlotEnvelopePage() {
   const [plot, setPlot] = useState<Plot | null>(null)
   const [envelope, setEnvelope] = useState<Envelope | null>(null)
   const [rulesets, setRulesets] = useState<RulesetSummary[]>([])
-  const [selectedRulesetId, setSelectedRulesetId] = useState<string>('up-bylaws')
-  const [activeTab, setActiveTab] = useState<'envelope' | 'rag'>('envelope')
+  const [selectedRulesetId, setSelectedRulesetId] = useState<string>('india-nbc-2016')
+  const [activeTab, setActiveTab] = useState<'workspace' | 'envelope' | 'rag'>('workspace')
 
   // Plot Form Inputs (Width x Depth)
   const [widthMeters, setWidthMeters] = useState('15')
@@ -205,21 +206,21 @@ function ProjectPlotEnvelopePage() {
     <AppShell currentTab="projects">
       <div className="flex flex-col gap-4 max-w-7xl w-full mx-auto pb-8">
         {/* Top Breadcrumb & Metadata Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[var(--line)] gap-2">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[var(--line)] gap-2.5">
+          <div className="flex flex-wrap items-center gap-2">
             <Link to="/projects" className="font-mono text-[11px] text-[var(--accent)] hover:underline">
               ← PROJECTS
             </Link>
             <span className="font-mono text-[11px] text-[var(--ink-50)]">/</span>
-            <span className="font-sans font-bold text-lg uppercase text-[var(--ink)]">
+            <span className="font-sans font-bold text-base sm:text-lg uppercase text-[var(--ink)]">
               {project?.name || 'Project Envelope'}
             </span>
             <BracketLabel text="PHASE 02" />
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <label htmlFor="jurisdiction-select" className="font-mono text-[11px] uppercase text-[var(--ink-50)]">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <label htmlFor="jurisdiction-select" className="font-mono text-[10.5px] sm:text-[11px] uppercase text-[var(--ink-50)]">
                 Ruleset:
               </label>
               <select
@@ -227,7 +228,7 @@ function ProjectPlotEnvelopePage() {
                 aria-label="Governing Jurisdiction Ruleset"
                 value={selectedRulesetId}
                 onChange={(e) => handleRulesetChange(e.target.value)}
-                className="font-mono text-[11px] uppercase bg-[var(--paper)] text-[var(--ink)] border border-[var(--line)] px-2 py-1 outline-none"
+                className="font-mono text-[10.5px] sm:text-[11px] uppercase bg-[var(--paper)] text-[var(--ink)] border border-[var(--line)] px-1.5 sm:px-2 py-1 outline-none"
               >
                 {rulesets.map((r) => (
                   <option key={r.id} value={r.id}>
@@ -248,11 +249,51 @@ function ProjectPlotEnvelopePage() {
           <Toast message={toastMsg.text} type={toastMsg.type} onClose={() => setToastMsg(null)} />
         )}
 
-        {/* Main Grid: Left Controls & Form | Right Spatial Drafting Workspace */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-          {/* Left Configuration Panel (4 Cols) */}
-          <div className="lg:col-span-4 flex flex-col gap-4">
-            <Card title="Plot Parameters" subtitle="Define site geometry and setbacks" darkHeader>
+        {/* Top-Level Architectural Workspace Switcher */}
+        <div className="flex flex-wrap items-center gap-2 border-b border-[var(--line)] pb-2 mb-2">
+          <button
+            type="button"
+            onClick={() => setActiveTab('workspace')}
+            className={`px-3 py-1.5 font-mono text-[11px] uppercase tracking-wider transition-colors ${
+              activeTab === 'workspace'
+                ? 'bg-[var(--ink)] text-[var(--paper)] font-bold'
+                : 'text-[var(--ink-72)] hover:bg-[var(--line-soft)]'
+            }`}
+          >
+            [01] 2D Plan Workspace & Review
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('envelope')}
+            className={`px-3 py-1.5 font-mono text-[11px] uppercase tracking-wider transition-colors ${
+              activeTab === 'envelope'
+                ? 'bg-[var(--ink)] text-[var(--paper)] font-bold'
+                : 'text-[var(--ink-72)] hover:bg-[var(--line-soft)]'
+            }`}
+          >
+            [02] Site Plot & Buildable Envelope
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('rag')}
+            className={`px-3 py-1.5 font-mono text-[11px] uppercase tracking-wider transition-colors ${
+              activeTab === 'rag'
+                ? 'bg-[var(--ink)] text-[var(--paper)] font-bold'
+                : 'text-[var(--ink-72)] hover:bg-[var(--line-soft)]'
+            }`}
+          >
+            [03] Statutory Rules & RAG Search ({envelope?.applied_rules.length || 0})
+          </button>
+        </div>
+
+        {activeTab === 'workspace' ? (
+          <PlanWorkspace projectId={projectId} rulesetId={selectedRulesetId} envelope={envelope} />
+        ) : (
+          /* Main Grid: Left Controls & Form | Right Spatial Drafting Workspace */
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            {/* Left Configuration Panel (4 Cols) */}
+            <div className="lg:col-span-4 flex flex-col gap-4">
+              <Card title="Plot Parameters" subtitle="Define site geometry and setbacks" darkHeader>
               <form onSubmit={handleSavePlot} className="flex flex-col gap-3">
                 <div className="grid grid-cols-2 gap-2">
                   <Input
@@ -439,9 +480,9 @@ function ProjectPlotEnvelopePage() {
             {activeTab === 'envelope' ? (
               /* Vector Drafting Canvas */
               <div
-                className="relative w-full border border-[var(--line)] bg-[var(--paper)] flex items-center justify-center p-6 overflow-hidden"
+                className="relative w-full border border-[var(--line)] bg-[var(--paper)] flex items-center justify-center p-3 sm:p-6 overflow-hidden"
                 style={{
-                  minHeight: '520px',
+                  minHeight: 'clamp(320px, 45vh, 520px)',
                   boxShadow: '0 4px 0 var(--ink)',
                   backgroundImage:
                     'radial-gradient(circle, var(--line-soft) 1px, transparent 1px)',
@@ -606,7 +647,8 @@ function ProjectPlotEnvelopePage() {
             )}
           </div>
         </div>
-      </div>
-    </AppShell>
-  )
+      )}
+    </div>
+  </AppShell>
+)
 }

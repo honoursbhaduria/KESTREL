@@ -144,7 +144,9 @@ async def search_rules(
             # Keyword bonus
             c_lower = chunk.content.lower()
             keyword_matches = sum(1 for tok in q_tokens if tok in c_lower)
-            final_score = round(min(1.0, sim * 0.7 + (keyword_matches / max(len(q_tokens), 1)) * 0.3), 3)
+            final_score = round(
+                min(1.0, sim * 0.7 + (keyword_matches / max(len(q_tokens), 1)) * 0.3), 3
+            )
 
             results.append(
                 SearchResult(

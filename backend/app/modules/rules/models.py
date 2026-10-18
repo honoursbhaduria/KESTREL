@@ -18,6 +18,4 @@ class RuleChunk(BaseModel):
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     embedding = mapped_column(Vector(1536), nullable=False)
-    chunk_metadata: Mapped[dict[str, Any]] = mapped_column(
-        JSONB, default=dict, nullable=False
-    )
+    chunk_metadata: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict, nullable=False)

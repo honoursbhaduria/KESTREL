@@ -1,6 +1,5 @@
 """Review Engine coordinating pure checkers, dependency filtering, and issue summaries (Phase 3)."""
 
-from typing import Any
 import structlog
 from pydantic import BaseModel, Field
 

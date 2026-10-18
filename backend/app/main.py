@@ -10,6 +10,7 @@ from app.core.errors import register_error_handlers
 from app.core.logging import setup_logging
 from app.modules.auth.router import router as auth_router
 from app.modules.jobs.router import router as jobs_router
+from app.modules.plans.router import router as plans_router
 from app.modules.projects.router import router as projects_router
 from app.modules.rules.router import router as rules_router
 from app.modules.system_router import router as system_router
@@ -42,6 +43,7 @@ app.add_middleware(CorrelationIdMiddleware)
 app.include_router(system_router)
 app.include_router(auth_router, prefix="/api/v1")
 app.include_router(projects_router, prefix="/api/v1")
+app.include_router(plans_router, prefix="/api/v1")
 app.include_router(rules_router, prefix="/api/v1")
 app.include_router(jobs_router, prefix="/api/v1")
 

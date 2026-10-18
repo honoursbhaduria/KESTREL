@@ -122,6 +122,99 @@ export interface Job {
   updated_at: string
 }
 
+export interface Room {
+  id: string
+  type: string
+  name: string
+  polygon: [number, number][]
+}
+
+export interface Wall {
+  id: string
+  start: [number, number]
+  end: [number, number]
+  thickness_mm: number
+  height_mm: number
+  is_external: boolean
+}
+
+export interface Opening {
+  id: string
+  wall_id: string
+  kind: 'door' | 'window'
+  offset_mm: number
+  width_mm: number
+  height_mm: number
+  sill_mm: number
+  swing?: 'inward_left' | 'inward_right' | 'outward_left' | 'outward_right'
+}
+
+export interface Stair {
+  id: string
+  polygon: [number, number][]
+  riser_mm: number
+  tread_mm: number
+  direction: 'up' | 'down'
+}
+
+export interface Level {
+  id: string
+  name: string
+  elevation_mm: number
+  floor_to_floor_mm: number
+  rooms: Room[]
+  walls: Wall[]
+  openings: Opening[]
+  stairs: Stair[]
+}
+
+export interface PlanData {
+  units: 'mm'
+  levels: Level[]
+}
+
+export interface Plan {
+  id: string
+  project_id: string
+  name: string
+  current_version: number
+  data: PlanData
+  created_at: string
+  updated_at: string
+}
+
+export interface PlanVersion {
+  id: string
+  plan_id: string
+  version: number
+  parent_version: number | null
+  created_by: string
+  message: string
+  created_at: string
+}
+
+export interface Issue {
+  id: string
+  rule_id: string
+  clause: string
+  category: string
+  status: 'pass' | 'review' | 'fail'
+  element_ids: string[]
+  measured: string | number
+  required: string | number
+  message: string
+}
+
+export interface ReviewResult {
+  issues: Issue[]
+  summary: {
+    pass_count: number
+    review_count: number
+    fail_count: number
+    total_rules_evaluated: number
+  }
+}
+
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001'
 
 class ApiClient {
@@ -400,6 +493,65 @@ class ApiClient {
 
   public async getJob(id: string): Promise<Job> {
     return this.request<Job>(`/api/v1/jobs/${id}`)
+  }
+
+  // Plans & Versioning Methods (Phase 3)
+  public async createPlan(
+    projectId: string,
+    payload: { name: string; data: PlanData | Record<string, unknown>; message?: string }
+  ): Promise<Plan> {
+    return this.request<Plan>(`/api/v1/projects/${projectId}/plans`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+  }
+
+  public async getPlan(id: string, version?: number): Promise<Plan> {
+    const url = version ? `/api/v1/plans/${id}?version=${version}` : `/api/v1/plans/${id}`
+    return this.request<Plan>(url)
+  }
+
+  public async applyPatches(
+    id: string,
+    payload: { message?: string; created_by?: string; patches: Record<string, unknown>[] }
+  ): Promise<Plan> {
+    return this.request<Plan>(`/api/v1/plans/${id}/patches`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    })
+  }
+
+  public async undoPlan(id: string): Promise<Plan> {
+    return this.request<Plan>(`/api/v1/plans/${id}/undo`, {
+      method: 'POST',
+    })
+  }
+
+  public async redoPlan(id: string): Promise<Plan> {
+    return this.request<Plan>(`/api/v1/plans/${id}/redo`, {
+      method: 'POST',
+    })
+  }
+
+  public async listPlanVersions(id: string): Promise<PlanVersion[]> {
+    return this.request<PlanVersion[]>(`/api/v1/plans/${id}/versions`)
+  }
+
+  public async getPlanDiff(
+    id: string,
+    fromVersion: number,
+    toVersion: number
+  ): Promise<Record<string, unknown>> {
+    return this.request<Record<string, unknown>>(
+      `/api/v1/plans/${id}/diff?from_version=${fromVersion}&to_version=${toVersion}`
+    )
+  }
+
+  public async reviewPlan(id: string, rulesetId?: string): Promise<ReviewResult> {
+    return this.request<ReviewResult>(`/api/v1/plans/${id}/review`, {
+      method: 'POST',
+      body: JSON.stringify(rulesetId ? { ruleset_id: rulesetId } : {}),
+    })
   }
 }
 
