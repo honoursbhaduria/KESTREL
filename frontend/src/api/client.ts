@@ -553,6 +553,133 @@ class ApiClient {
       body: JSON.stringify(rulesetId ? { ruleset_id: rulesetId } : {}),
     })
   }
+
+  // -----------------------------------------------------------
+  // Phase 4: Brief, Program & Layout Generation
+  // -----------------------------------------------------------
+  public async setProjectBrief(projectId: string, briefText: string): Promise<BriefProgramResponse> {
+    return this.request<BriefProgramResponse>(`/api/v1/projects/${projectId}/brief`, {
+      method: 'PUT',
+      body: JSON.stringify({ brief_text: briefText }),
+    })
+  }
+
+  public async getProjectProgram(projectId: string): Promise<BriefProgramResponse> {
+    return this.request<BriefProgramResponse>(`/api/v1/projects/${projectId}/program`)
+  }
+
+  public async setProjectProgram(projectId: string, program: Program): Promise<BriefProgramResponse> {
+    return this.request<BriefProgramResponse>(`/api/v1/projects/${projectId}/program`, {
+      method: 'PUT',
+      body: JSON.stringify({ program }),
+    })
+  }
+
+  public async generatePlans(
+    projectId: string,
+    numOptions: number = 3,
+    seed: number = 42
+  ): Promise<GenerateJobResponse> {
+    return this.request<GenerateJobResponse>(`/api/v1/projects/${projectId}/generate`, {
+      method: 'POST',
+      body: JSON.stringify({ num_options: numOptions, seed }),
+    })
+  }
+
+  public async listGeneratedOptions(projectId: string): Promise<GeneratedOptionsResponse> {
+    return this.request<GeneratedOptionsResponse>(`/api/v1/projects/${projectId}/generated-options`)
+  }
+}
+
+export interface RoomProgram {
+  type: string
+  name: string
+  target_area_mm2: number
+  min_width_mm: number
+  level_hint: number
+  needs_exterior_wall: boolean
+  needs_attached_bath: boolean
+}
+
+export interface Adjacency {
+  a: string
+  b: string
+  strength: 'must' | 'prefer' | 'avoid'
+}
+
+export interface Preferences {
+  entrance_side: 'north' | 'east' | 'south' | 'west'
+  vastu: boolean
+  parking: boolean
+  style_notes: string
+}
+
+export interface Program {
+  levels: number
+  rooms: RoomProgram[]
+  adjacencies: Adjacency[]
+  preferences: Preferences
+}
+
+export interface FeasibilityViolation {
+  category: string
+  item: string
+  measured: number
+  required: number
+  message: string
+}
+
+export interface FeasibilityResult {
+  is_feasible: boolean
+  total_proposed_area_sqm: number
+  max_builtup_area_sqm: number
+  ground_coverage_sqm: number
+  max_coverage_sqm: number
+  explanation?: string | null
+  suggested_program?: Program | null
+  violations: FeasibilityViolation[]
+}
+
+export interface BriefProgramResponse {
+  brief_text?: string | null
+  program: Program
+  feasibility: FeasibilityResult
+}
+
+export interface ScoreBreakdown {
+  total_score: number
+  area_score: number
+  adjacency_score: number
+  aspect_ratio_score: number
+  exterior_wall_score: number
+  circulation_score: number
+  orientation_score: number
+  vastu_score: number
+}
+
+export interface GeneratedOptionItem {
+  id: string
+  project_id: string
+  name: string
+  created_by: string
+  score_breakdown?: ScoreBreakdown | null
+  description: string
+  review_summary: {
+    passes: number
+    reviews: number
+    fails: number
+  }
+  data?: PlanData | null
+  created_at: string
+}
+
+export interface GeneratedOptionsResponse {
+  options: GeneratedOptionItem[]
+}
+
+export interface GenerateJobResponse {
+  job_id: string
+  status: string
 }
 
 export const api = new ApiClient()

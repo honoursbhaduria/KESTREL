@@ -1,6 +1,7 @@
 """Tests for LLM wrapper, structured output, retries, and usage/cost logging."""
 
 import uuid
+
 import pytest
 from pydantic import BaseModel, Field
 from sqlalchemy import select

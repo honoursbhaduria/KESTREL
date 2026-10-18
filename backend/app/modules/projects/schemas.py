@@ -40,7 +40,18 @@ class ProjectListResponse(BaseModel):
 
 class RoadSideItem(BaseModel):
     edge_index: int = Field(..., ge=0, description="0-indexed edge index in boundary polygon")
-    road_width_mm: float = Field(..., gt=0, description="Road width in millimetres")
+    road_width_mm: float = Field(default=9000.0, description="Road width in millimetres")
+    road_width_m: float | None = Field(default=None, description="Road width in metres")
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_road_width(cls, data: Any) -> Any:
+        if isinstance(data, dict):
+            if "road_width_mm" not in data and "road_width_m" in data:
+                data["road_width_mm"] = float(data["road_width_m"]) * 1000.0
+            elif "road_width_mm" in data and "road_width_m" not in data:
+                data["road_width_m"] = float(data["road_width_mm"]) / 1000.0
+        return data
 
 
 class SetPlotRequest(BaseModel):
@@ -55,6 +66,10 @@ class SetPlotRequest(BaseModel):
         default=None,
         description="Plan-local 2D polygon coordinates in mm [[x, y], ...]",
     )
+    boundary_coords: list[list[float]] | None = Field(
+        default=None,
+        description="Alias for boundary",
+    )
 
     # Optional GIS/geographic original boundary (WGS84 lat/long)
     original_geo_boundary: list[list[float]] | None = Field(
@@ -67,6 +82,9 @@ class SetPlotRequest(BaseModel):
 
     @model_validator(mode="after")
     def validate_plot(self) -> "SetPlotRequest":
+        if self.boundary is None and self.boundary_coords is not None:
+            self.boundary = self.boundary_coords
+
         # 1. Width × Depth input
         if self.width_mm is not None and self.depth_mm is not None:
             w, d = self.width_mm, self.depth_mm
@@ -133,3 +151,40 @@ class PlotResponse(BaseModel):
     plot_area_mm2: float
     created_at: datetime
     updated_at: datetime
+
+
+class SetBriefRequest(BaseModel):
+    brief_text: str = Field(min_length=1, description="Architectural client brief in free text")
+
+
+class BriefProgramResponse(BaseModel):
+    brief_text: str | None = None
+    program: Any
+    feasibility: Any
+
+
+class SetProgramRequest(BaseModel):
+    program: Any
+
+
+class GenerateLayoutRequest(BaseModel):
+    num_options: int = Field(default=3, ge=1, le=10, description="Number of scheme options to generate")
+    seed: int = Field(default=42, description="RNG seed for deterministic layout generation")
+
+
+class GeneratedOptionItem(BaseModel):
+    id: str
+    project_id: str
+    name: str
+    created_by: str
+    score_breakdown: dict[str, Any] | None = None
+    description: str = ""
+    review_summary: dict[str, Any] = Field(default_factory=dict)
+    data: dict[str, Any] | None = None
+    created_at: datetime
+
+
+class GeneratedOptionsResponse(BaseModel):
+    options: list[GeneratedOptionItem]
+
+

@@ -3,15 +3,14 @@
 import abc
 import asyncio
 import json
-import os
 import re
 import uuid
 from pathlib import Path
-from typing import Any, TypeVar
+from typing import TypeVar
 
 import httpx
 import structlog
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.models import UsageEvent
@@ -107,11 +106,16 @@ class MockLLMProvider(LLMProvider):
                 rooms.append({"type": "bedroom", "name": "Kids Bedroom", "target_area_mm2": 13_000_000.0, "min_width_mm": 3000.0, "level_hint": 2, "needs_exterior_wall": True, "needs_attached_bath": False})
 
             entrance_side = "east"
-            if "north" in prompt.lower():
+            brief_match = re.search(r"Client Brief:\s*(.*)", prompt, re.DOTALL | re.IGNORECASE)
+            brief_content = brief_match.group(1).lower() if brief_match else prompt.lower()
+
+            if "east" in brief_content:
+                entrance_side = "east"
+            elif "north" in brief_content:
                 entrance_side = "north"
-            elif "west" in prompt.lower():
+            elif "west" in brief_content:
                 entrance_side = "west"
-            elif "south" in prompt.lower():
+            elif "south" in brief_content:
                 entrance_side = "south"
 
             out_text = json.dumps({
@@ -123,8 +127,8 @@ class MockLLMProvider(LLMProvider):
                 ],
                 "preferences": {
                     "entrance_side": entrance_side,
-                    "vastu": "vastu" in prompt.lower(),
-                    "parking": "parking" in prompt.lower(),
+                    "vastu": "vastu" in brief_content,
+                    "parking": "parking" in brief_content,
                     "style_notes": "Modern residential layout with natural daylight.",
                 },
             })

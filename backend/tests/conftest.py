@@ -21,8 +21,8 @@ from app.core.config import get_settings
 get_settings.cache_clear()
 test_settings = get_settings()
 
-import app.db.session as db_session_module
 import app.ai.models  # noqa: F401
+import app.db.session as db_session_module
 import app.modules.auth.models  # noqa: F401
 import app.modules.jobs.models  # noqa: F401
 import app.modules.plans.models  # noqa: F401

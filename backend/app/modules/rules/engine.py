@@ -70,3 +70,19 @@ class ReviewEngine:
         }
 
         return ReviewResult(issues=issues, summary=summary)
+
+
+def review_plan(
+    plan: PlanData,
+    envelope: Envelope | None,
+    ruleset: RulesetDefinition,
+    modified_element_types: set[str] | None = None,
+) -> ReviewResult:
+    """Convenience functional interface to review a plan."""
+    engine = ReviewEngine()
+    return engine.review_plan(
+        plan=plan,
+        envelope=envelope,
+        ruleset=ruleset,
+        modified_element_types=modified_element_types,
+    )

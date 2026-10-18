@@ -1,6 +1,7 @@
 """Tests for asynchronous layout generation job and statutory verification of generated options."""
 
 import uuid
+
 import pytest
 from httpx import AsyncClient
 from sqlalchemy import select
@@ -20,7 +21,7 @@ async def setup_project_for_generation(client: AsyncClient, auth_org_a: dict) ->
     proj_id = p_resp.json()["id"]
 
     # 2. Assign ruleset
-    await client.put(f"/api/v1/projects/{proj_id}/ruleset", json={"ruleset_id": "up-bylaws/v1"}, headers=headers)
+    await client.put(f"/api/v1/projects/{proj_id}/ruleset", json={"ruleset_id": "up-bylaws"}, headers=headers)
 
     # 3. Assign plot (12m x 18m)
     plot_coords = [[0.0, 0.0], [12000.0, 0.0], [12000.0, 18000.0], [0.0, 18000.0]]
@@ -68,7 +69,7 @@ async def test_post_generate_job_idempotency(client: AsyncClient, setup_project_
 
 @pytest.mark.asyncio
 async def test_generation_pipeline_end_to_end(
-    client: AsyncClient, setup_project_for_generation: dict, db_session: AsyncSession
+    client: AsyncClient, setup_project_for_generation: dict
 ):
     """Verify execution of generation task produces valid, scored Plans with no hard fails."""
     proj_id = setup_project_for_generation["project_id"]
@@ -93,11 +94,12 @@ async def test_generation_pipeline_end_to_end(
     )
     assert task_res.get("status") == "success"
 
-    # Verify job is DONE
-    job_q = select(Job).where(Job.id == uuid.UUID(job_id))
-    job = (await db_session.execute(job_q)).scalar_one()
-    assert job.status == JobStatus.DONE
-    assert job.progress == 100
+    # Verify job is DONE via API
+    job_resp = await client.get(f"/api/v1/jobs/{job_id}", headers=headers)
+    assert job_resp.status_code == 200
+    job_data = job_resp.json()
+    assert job_data["status"] == "done"
+    assert job_data["progress"] == 100
 
     # Query generated options endpoint
     opts_resp = await client.get(f"/api/v1/projects/{proj_id}/generated-options", headers=headers)

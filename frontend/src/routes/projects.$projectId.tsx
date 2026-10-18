@@ -9,6 +9,7 @@ import {
   type RuleSearchResult,
 } from '~/api/client'
 import { PlanWorkspace } from '~/components/plan/PlanWorkspace'
+import { PlanGenerator } from '~/components/plan/PlanGenerator'
 import { AppShell } from '~/components/layout/AppShell'
 import { Button } from '~/components/shared/Button'
 import { Card } from '~/components/shared/Card'
@@ -37,7 +38,8 @@ function ProjectPlotEnvelopePage() {
   const [envelope, setEnvelope] = useState<Envelope | null>(null)
   const [rulesets, setRulesets] = useState<RulesetSummary[]>([])
   const [selectedRulesetId, setSelectedRulesetId] = useState<string>('india-nbc-2016')
-  const [activeTab, setActiveTab] = useState<'workspace' | 'envelope' | 'rag'>('workspace')
+  const [activeTab, setActiveTab] = useState<'generator' | 'workspace' | 'envelope' | 'rag'>('generator')
+  const [workspacePlanId, setWorkspacePlanId] = useState<string | undefined>(undefined)
 
   // Plot Form Inputs (Width x Depth)
   const [widthMeters, setWidthMeters] = useState('15')
@@ -253,6 +255,17 @@ function ProjectPlotEnvelopePage() {
         <div className="flex flex-wrap items-center gap-2 border-b border-[var(--line)] pb-2 mb-2">
           <button
             type="button"
+            onClick={() => setActiveTab('generator')}
+            className={`px-3 py-1.5 font-mono text-[11px] uppercase tracking-wider transition-colors ${
+              activeTab === 'generator'
+                ? 'bg-[var(--accent)] text-[var(--paper)] font-bold'
+                : 'text-[var(--ink-72)] hover:bg-[var(--line-soft)]'
+            }`}
+          >
+            [00] AI Brief & Generator
+          </button>
+          <button
+            type="button"
             onClick={() => setActiveTab('workspace')}
             className={`px-3 py-1.5 font-mono text-[11px] uppercase tracking-wider transition-colors ${
               activeTab === 'workspace'
@@ -286,8 +299,22 @@ function ProjectPlotEnvelopePage() {
           </button>
         </div>
 
-        {activeTab === 'workspace' ? (
-          <PlanWorkspace projectId={projectId} rulesetId={selectedRulesetId} envelope={envelope} />
+        {activeTab === 'generator' ? (
+          <PlanGenerator
+            projectId={projectId}
+            envelope={envelope}
+            onOpenInWorkspace={(planId) => {
+              setWorkspacePlanId(planId)
+              setActiveTab('workspace')
+            }}
+          />
+        ) : activeTab === 'workspace' ? (
+          <PlanWorkspace
+            projectId={projectId}
+            rulesetId={selectedRulesetId}
+            envelope={envelope}
+            initialPlanId={workspacePlanId}
+          />
         ) : (
           /* Main Grid: Left Controls & Form | Right Spatial Drafting Workspace */
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">

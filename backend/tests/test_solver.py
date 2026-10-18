@@ -132,11 +132,11 @@ def test_solver_vertical_stair_alignment():
     assert len(candidates) >= 1
 
     for cand in candidates:
-        l1 = next(l for l in cand.plan_data.levels if "1" in l.name or l.elevation_mm == 0.0)
-        l2 = next(l for l in cand.plan_data.levels if "2" in l.name or l.elevation_mm > 0.0)
+        lvl1 = next(lvl for lvl in cand.plan_data.levels if "1" in lvl.name or lvl.elevation_mm == 0.0)
+        lvl2 = next(lvl for lvl in cand.plan_data.levels if "2" in lvl.name or lvl.elevation_mm > 0.0)
 
-        stair1 = next(r for r in l1.rooms if r.type == "stair")
-        stair2 = next(r for r in l2.rooms if r.type == "stair")
+        stair1 = next(r for r in lvl1.rooms if r.type == "stair")
+        stair2 = next(r for r in lvl2.rooms if r.type == "stair")
 
         p1 = Polygon(stair1.polygon)
         p2 = Polygon(stair2.polygon)

@@ -1,12 +1,12 @@
 """Architectural program models and statutory envelope feasibility verification."""
 
 import copy
-from typing import Any, Literal
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
 from app.modules.planning.envelope import Envelope
-from app.modules.rules.schemas import Ruleset
+from app.modules.rules.schemas import RulesetDefinition
 
 
 class RoomProgram(BaseModel):
@@ -98,7 +98,7 @@ STANDARD_ROOM_MINIMUMS: dict[str, dict[str, float]] = {
 def validate_program_feasibility(
     program: Program,
     envelope: Envelope,
-    ruleset: Ruleset | None = None,
+    ruleset: RulesetDefinition | None = None,
 ) -> FeasibilityResult:
     """Verify that the proposed program conforms to legal buildable envelope (FAR, Coverage) and room minimums.
     If infeasible, provides a suggested scaled program rather than silently shrinking.

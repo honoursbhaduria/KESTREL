@@ -20,7 +20,7 @@ async def project_with_plot_and_envelope(client: AsyncClient, auth_org_a: dict) 
     # 2. Set ruleset
     await client.put(
         f"/api/v1/projects/{proj_id}/ruleset",
-        json={"ruleset_id": "up-bylaws/v1"},
+        json={"ruleset_id": "up-bylaws"},
         headers=headers,
     )
 

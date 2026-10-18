@@ -1,20 +1,27 @@
 """API router for project, plot, ruleset, and envelope management."""
 
 import uuid
+from typing import Any
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, Header, Query, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db_session
 from app.modules.auth.dependencies import AuthContext, get_current_auth_context
 from app.modules.planning.envelope import Envelope
 from app.modules.projects.schemas import (
+    BriefProgramResponse,
+    GeneratedOptionItem,
+    GeneratedOptionsResponse,
+    GenerateLayoutRequest,
     PlotResponse,
     ProjectCreate,
     ProjectListResponse,
     ProjectResponse,
     ProjectUpdate,
+    SetBriefRequest,
     SetPlotRequest,
+    SetProgramRequest,
 )
 from app.modules.projects.service import ProjectService
 from app.modules.rules.schemas import SetProjectRulesetRequest
@@ -150,3 +157,83 @@ async def get_project_envelope(
 ) -> Envelope:
     service = ProjectService(session)
     return await service.get_envelope(project_id, auth.org.id)
+
+
+# -------------------------------------------------------------
+# Brief & Program Endpoints (Phase 4)
+# -------------------------------------------------------------
+@router.put("/{project_id}/brief", response_model=BriefProgramResponse)
+async def set_project_brief(
+    project_id: uuid.UUID,
+    data: SetBriefRequest,
+    auth: AuthContext = Depends(get_current_auth_context),
+    session: AsyncSession = Depends(get_db_session),
+) -> BriefProgramResponse:
+    service = ProjectService(session)
+    result = await service.set_brief(project_id, auth.org.id, data.brief_text)
+    return BriefProgramResponse(**result)
+
+
+@router.get("/{project_id}/program", response_model=BriefProgramResponse)
+async def get_project_program(
+    project_id: uuid.UUID,
+    auth: AuthContext = Depends(get_current_auth_context),
+    session: AsyncSession = Depends(get_db_session),
+) -> BriefProgramResponse:
+    service = ProjectService(session)
+    result = await service.get_program(project_id, auth.org.id)
+    return BriefProgramResponse(**result)
+
+
+@router.put("/{project_id}/program", response_model=BriefProgramResponse)
+async def set_project_program(
+    project_id: uuid.UUID,
+    data: SetProgramRequest,
+    auth: AuthContext = Depends(get_current_auth_context),
+    session: AsyncSession = Depends(get_db_session),
+) -> BriefProgramResponse:
+    service = ProjectService(session)
+    result = await service.set_program(project_id, auth.org.id, data.program)
+    return BriefProgramResponse(**result)
+
+
+# -------------------------------------------------------------
+# Generative Options Endpoints (Phase 4)
+# -------------------------------------------------------------
+@router.post("/{project_id}/generate")
+async def generate_project_plans(
+    project_id: uuid.UUID,
+    data: GenerateLayoutRequest,
+    response: Response,
+    idempotency_key: str | None = Header(None, alias="Idempotency-Key"),
+    auth: AuthContext = Depends(get_current_auth_context),
+    session: AsyncSession = Depends(get_db_session),
+) -> dict[str, Any]:
+    service = ProjectService(session)
+    job, is_new = await service.enqueue_generation_job(
+        project_id=project_id,
+        org_id=auth.org.id,
+        num_options=data.num_options,
+        seed=data.seed,
+        idempotency_key=idempotency_key,
+    )
+    response.status_code = status.HTTP_202_ACCEPTED if is_new else status.HTTP_200_OK
+    return {
+        "job_id": str(job.id),
+        "status": job.status.value,
+    }
+
+
+@router.get("/{project_id}/generated-options", response_model=GeneratedOptionsResponse)
+async def list_project_generated_options(
+    project_id: uuid.UUID,
+    auth: AuthContext = Depends(get_current_auth_context),
+    session: AsyncSession = Depends(get_db_session),
+) -> GeneratedOptionsResponse:
+    service = ProjectService(session)
+    options = await service.list_generated_options(project_id, auth.org.id)
+    return GeneratedOptionsResponse(
+        options=[GeneratedOptionItem.model_validate(o) for o in options]
+    )
+
+

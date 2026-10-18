@@ -22,12 +22,14 @@ interface PlanWorkspaceProps {
   projectId: string
   rulesetId?: string
   envelope?: Envelope | null
+  initialPlanId?: string
 }
 
 export const PlanWorkspace: React.FC<PlanWorkspaceProps> = ({
   projectId,
   rulesetId,
   envelope,
+  initialPlanId,
 }) => {
   const [plan, setPlan] = useState<Plan | null>(null)
   const [currentLevelIdx, setCurrentLevelIdx] = useState(0)
@@ -72,7 +74,8 @@ export const PlanWorkspace: React.FC<PlanWorkspaceProps> = ({
     try {
       setLoading(true)
       try {
-        const storedPlan = await api.getPlan(projectId)
+        const targetId = initialPlanId || projectId
+        const storedPlan = await api.getPlan(targetId)
         setPlan(storedPlan)
       } catch {
         const newPlan = await api.createPlan(projectId, {
