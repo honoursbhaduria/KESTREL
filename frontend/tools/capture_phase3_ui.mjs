@@ -18,38 +18,25 @@ async function run() {
   console.log('Submitting registration...')
   await page.click('button[type="submit"]')
 
-  // Wait for redirect to projects
   console.log('Waiting for projects page...')
   await page.waitForURL('**/projects', { timeout: 15000 })
   await page.waitForTimeout(1000)
 
-  // Create a new project
-  console.log('Creating project...')
-  const newProjBtn = await page.$('button:has-text("New Project"), button:has-text("Create Project")')
-  if (newProjBtn) {
-    await newProjBtn.click()
-    await page.waitForTimeout(600)
-    await page.fill('input[placeholder*="Name"], input[name="name"]', 'Skyline Modern Residence')
-    await page.click('button:has-text("Create"), button:has-text("Save")')
-    await page.waitForTimeout(1500)
-  }
+  console.log('Opening New Project modal...')
+  await page.click('button:has-text("New Project")')
+  await page.waitForTimeout(600)
 
-  // Open the project
-  console.log('Opening project workspace...')
-  const projectLink = await page.$('a[href*="/projects/"]')
-  if (projectLink) {
-    await projectLink.click()
-  }
+  console.log('Filling Project Title...')
+  await page.fill('input[placeholder="e.g. Vasant Vihar Villa, Sector 42"]', 'Skyline Modern Residence')
+  await page.click('button:has-text("Create Project")')
+  await page.waitForTimeout(1500)
+
+  console.log('Opening project details...')
+  // Click on the project card with title
+  await page.click('text="Skyline Modern Residence"')
 
   await page.waitForURL('**/projects/**', { timeout: 15000 })
   await page.waitForTimeout(2000)
-
-  // Ensure workspace tab is active
-  const workspaceTab = await page.$('button:has-text("[01] 2D Plan Workspace")')
-  if (workspaceTab) {
-    await workspaceTab.click()
-    await page.waitForTimeout(1000)
-  }
 
   const artifactDir = '/home/honours/.gemini/antigravity-cli/brain/74207a42-7f4f-4838-9c61-9d51bad2ce60'
 
@@ -65,7 +52,7 @@ async function run() {
     await page.waitForTimeout(2000)
   }
 
-  // 3. Switch to violations fixture scheme to demonstrate statutory checks
+  // 3. Switch to Code Violations Fixture
   console.log('Switching to Code Violations Fixture...')
   const fixtureSelect = await page.$('select[aria-label="Load Prebuilt Architectural Scheme"]')
   if (fixtureSelect) {
@@ -80,7 +67,7 @@ async function run() {
     }
 
     // Click on a fail issue to highlight
-    const failCard = await page.$('div:has-text("Fail"):has-text("below required minimum")')
+    const failCard = await page.$('div:has-text("Fail"):has-text("is below required minimum")')
     if (failCard) {
       await failCard.click()
       await page.waitForTimeout(1000)
@@ -100,7 +87,7 @@ async function run() {
     await page.screenshot({ path: `${artifactDir}/screenshot_version_history.png`, fullPage: false })
   }
 
-  console.log('All screenshots captured successfully!')
+  console.log('All Phase 3 screenshots captured successfully!')
   await browser.close()
 }
 
