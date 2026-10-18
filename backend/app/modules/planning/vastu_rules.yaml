@@ -1,0 +1,44 @@
+# Vastu Shastra Heuristics Configuration for Residential Layout Planning
+# Quadrants of the building footprint:
+#   north_east (Ishanya) - Water / Spiritual
+#   east (Purva) - Light / Vitality
+#   south_east (Agni) - Fire / Transformation
+#   south (Dakshina) - Strength
+#   south_west (Nairutya) - Earth / Stability
+#   west (Pashchima) - Air / Water
+#   north_west (Vayu) - Movement / Guest
+#   north (Uttara) - Wealth / Opportunity
+#   center (Brahmasthan) - Core / Circulation
+
+rules:
+  kitchen:
+    preferred_zones: ["south_east", "north_west"]
+    weight: 20
+    rationale: "Agni corner (SE) is ideal for cooking and fire elements; NW (Vayu) is permissible alternate."
+
+  master_bedroom:
+    preferred_zones: ["south_west", "south", "west"]
+    weight: 25
+    rationale: "Nairutya corner (SW) provides structural stability, heavy anchoring, and master privacy."
+
+  pooja:
+    preferred_zones: ["north_east", "north", "east"]
+    weight: 20
+    rationale: "Ishanya corner (NE) represents spiritual purity, morning sun rays, and clarity."
+
+  living:
+    preferred_zones: ["north_east", "north", "east", "center"]
+    weight: 15
+    rationale: "Social gatherings and entrance foyers thrive in morning daylight and accessible quadrants."
+
+  bathroom:
+    preferred_zones: ["north_west", "west", "south"]
+    avoid_zones: ["north_east", "south_west"]
+    weight: 10
+    rationale: "Wet waste disposal belongs in outer air quadrants (NW/W); forbidden in NE and SW."
+
+  stair:
+    preferred_zones: ["south", "west", "south_west"]
+    avoid_zones: ["north_east", "center"]
+    weight: 10
+    rationale: "Heavy vertical massing should anchor the southern or western boundary, never central Brahmasthan or NE."

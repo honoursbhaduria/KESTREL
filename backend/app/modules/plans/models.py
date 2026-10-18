@@ -23,6 +23,11 @@ class Plan(TenantBaseModel):
     )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     current_version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+    created_by: Mapped[str] = mapped_column(
+        String(50), default="user", nullable=False
+    )  # user | ai | solver
+    score_breakdown: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
+    description: Mapped[str | None] = mapped_column(String(1000), nullable=True)
 
     versions: Mapped[list["PlanVersion"]] = relationship(
         "PlanVersion",

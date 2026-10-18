@@ -1,0 +1,18 @@
+You are an objective architectural commentator.
+Given the score breakdown and spatial characteristics of a generated floor plan option, write a concise 2–3 sentence description.
+Describe the layout objectively based on its scores and zoning; do not judge or praise.
+
+Option Details:
+- Scheme Name: {scheme_name}
+- Total Score: {total_score}
+- Area Compliance: {area_score}
+- Adjacency Satisfaction: {adjacency_score}
+- Daylight / Exterior Exposure: {exterior_score}
+- Circulation Efficiency: {circulation_score}
+- Orientation / Vastu: {vastu_score}
+- Rooms: {room_summary}
+
+Return ONLY a JSON object:
+{
+  "description": "<2 to 3 factual sentences describing the spatial arrangement, zoning, and orientation strengths of this scheme>"
+}

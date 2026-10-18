@@ -18,6 +18,8 @@ class Project(TenantBaseModel):
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     status: Mapped[str] = mapped_column(String(50), default="active", nullable=False)
     ruleset_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    brief_text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    program_data: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
 
     plot: Mapped["Plot | None"] = relationship(
         "Plot",
