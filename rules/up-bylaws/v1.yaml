@@ -1,0 +1,89 @@
+id: "up-bylaws"
+name: "Uttar Pradesh Model Building Bylaws"
+jurisdiction: "Uttar Pradesh, India"
+version: "2016.1"
+description: "UP Urban Planning and Development (Model Building) Bylaws for plotted residential developments."
+rules:
+  - id: "up-residential-setbacks-tier2"
+    title: "Plotted Residential Setbacks (151 to 300 sqm)"
+    clause: "UP Model Bylaws 2016, Chapter 4, Table 4.1"
+    category: "setback"
+    applies_to: "plot"
+    check: "check_setbacks"
+    params:
+      min_plot_area_sqm: 151.0
+      max_plot_area_sqm: 300.0
+      front_setback_mm: 3000
+      rear_setback_mm: 2000
+      side_setback_mm: 1500
+    severity: "fail"
+    verified: true
+    notes: "For plots between 151 and 300 sqm: Front 3.0m, Rear 2.0m, Side 1.5m."
+
+  - id: "up-residential-setbacks-tier3"
+    title: "Plotted Residential Setbacks (301 to 500 sqm)"
+    clause: "UP Model Bylaws 2016, Chapter 4, Table 4.1"
+    category: "setback"
+    applies_to: "plot"
+    check: "check_setbacks"
+    params:
+      min_plot_area_sqm: 301.0
+      max_plot_area_sqm: 500.0
+      front_setback_mm: 4500
+      rear_setback_mm: 3000
+      side_setback_mm: 2000
+    severity: "fail"
+    verified: true
+    notes: "For plots between 301 and 500 sqm: Front 4.5m, Rear 3.0m, Sides 2.0m."
+
+  - id: "up-ground-coverage-standard"
+    title: "Maximum Permissible Ground Coverage"
+    clause: "UP Model Bylaws 2016, Table 4.2"
+    category: "coverage"
+    applies_to: "plot"
+    check: "check_coverage"
+    params:
+      max_coverage_pct_tier2: 60.0
+      max_coverage_pct_tier3: 55.0
+      max_coverage_pct_tier4: 50.0
+    severity: "fail"
+    verified: true
+    notes: "Permissible ground coverage is 60% for plots 151-300 sqm, 55% for 301-500 sqm."
+
+  - id: "up-floor-area-ratio"
+    title: "Permissible Floor Area Ratio (FAR)"
+    clause: "UP Model Bylaws 2016, Table 4.2"
+    category: "far"
+    applies_to: "plot"
+    check: "check_far"
+    params:
+      base_far: 1.50
+      purchasable_far_max: 2.00
+    severity: "fail"
+    verified: true
+    notes: "Base FAR for plotted residential is 1.50."
+
+  - id: "up-max-height-residential"
+    title: "Maximum Permissible Building Height"
+    clause: "UP Model Bylaws 2016, Clause 4.8"
+    category: "height"
+    applies_to: "building"
+    check: "check_max_height"
+    params:
+      max_height_mm: 15000
+      max_floors: 4
+    severity: "fail"
+    verified: true
+    notes: "Maximum permissible height for low-rise plotted residential is 15.0 m (G+3)."
+
+  - id: "up-stilt-parking-clearance"
+    title: "Stilt Parking Clearance Height"
+    clause: "UP Model Bylaws 2016, Clause 4.12"
+    category: "parking"
+    applies_to: "level:stilt"
+    check: "check_stilt_height"
+    params:
+      min_clear_height_mm: 2400
+    severity: "review"
+    verified: false
+    notes: "TODO: source verification from UP Gazetted Notification No. 1202/8-1-16."

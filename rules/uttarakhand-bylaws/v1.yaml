@@ -1,0 +1,69 @@
+id: "uttarakhand-bylaws"
+name: "Uttarakhand Hill Housing and Urban Planning Bylaws"
+jurisdiction: "Uttarakhand (Hill Areas), India"
+version: "2018.1"
+description: "Uttarakhand Urban and Country Planning Department building bylaws for hill terrain, slope stability, and eco-sensitive zones."
+rules:
+  - id: "uk-hill-setbacks"
+    title: "Hill Slope Setbacks for Plotted Housing"
+    clause: "Uttarakhand Building Bylaws 2018, Hill Chapter 7, Section 7.2"
+    category: "setback"
+    applies_to: "plot"
+    check: "check_setbacks"
+    params:
+      front_setback_mm: 3000
+      rear_setback_mm: 2000
+      side_setback_mm: 1500
+    severity: "fail"
+    verified: true
+    notes: "Hill slope minimum setbacks: Front 3.0m, Rear 2.0m, Sides 1.5m to allow slope drainage and stabilization."
+
+  - id: "uk-hill-ground-coverage"
+    title: "Hill Terrain Maximum Ground Coverage"
+    clause: "Uttarakhand Building Bylaws 2018, Section 7.4"
+    category: "coverage"
+    applies_to: "plot"
+    check: "check_coverage"
+    params:
+      max_coverage_pct: 45.0
+    severity: "fail"
+    verified: true
+    notes: "Maximum ground coverage restricted to 45% to minimize hill cut and soil erosion."
+
+  - id: "uk-hill-far"
+    title: "Floor Area Ratio on Sloping Terrain"
+    clause: "Uttarakhand Building Bylaws 2018, Section 7.5"
+    category: "far"
+    applies_to: "plot"
+    check: "check_far"
+    params:
+      base_far: 1.20
+      max_far: 1.50
+    severity: "fail"
+    verified: true
+    notes: "Base FAR 1.20 in hill towns."
+
+  - id: "uk-hill-max-height"
+    title: "Maximum Building Height on Slopes"
+    clause: "Uttarakhand Building Bylaws 2018, Section 7.6"
+    category: "height"
+    applies_to: "building"
+    check: "check_max_height"
+    params:
+      max_height_mm: 11000
+      max_floors: 3
+    severity: "fail"
+    verified: true
+    notes: "Maximum height 11.0m (G+2 or equivalent step-terrace floors on contour)."
+
+  - id: "uk-hill-slope-angle-threshold"
+    title: "Steep Slope Construction Restriction"
+    clause: "Uttarakhand Disaster Mitigation and Hill Construction Bylaws"
+    category: "coverage"
+    applies_to: "plot"
+    check: "check_slope_stability"
+    params:
+      max_slope_deg: 30.0
+    severity: "review"
+    verified: false
+    notes: "TODO: source verification from Uttarakhand State Disaster Management Authority guidelines on slopes exceeding 30 degrees."

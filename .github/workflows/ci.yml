@@ -1,0 +1,114 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    name: Backend Lint, Typecheck, Migrations & Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4-alpine
+        env:
+          POSTGRES_DB: haron_test
+          POSTGRES_USER: haron
+          POSTGRES_PASSWORD: haron_secret
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "latest"
+
+      - name: Install Dependencies
+        run: uv sync --extra dev
+
+      - name: Run Ruff Linter
+        run: uv run ruff check .
+
+      - name: Run Ruff Format Check
+        run: uv run ruff format --check .
+
+      - name: Run Mypy Typecheck
+        run: uv run mypy app
+
+      - name: Install pgvector in Postgres Service Container
+        run: |
+          docker exec ${{ job.services.postgres.id }} apk add --no-cache postgresql-pgvector
+          docker exec ${{ job.services.postgres.id }} cp /usr/lib/postgresql16/vector.so $(docker exec ${{ job.services.postgres.id }} pg_config --pkglibdir)/
+          docker exec ${{ job.services.postgres.id }} cp /usr/share/postgresql16/extension/vector* $(docker exec ${{ job.services.postgres.id }} pg_config --sharedir)/extension/
+
+      - name: Verify Alembic Migrations
+        env:
+          DATABASE_URL: postgresql+asyncpg://haron:haron_secret@localhost:5432/haron_test
+          REDIS_URL: redis://localhost:6379/0
+          JWT_SECRET_KEY: test_secret_key_minimum_thirty_two_chars_long
+        run: uv run alembic upgrade head
+
+      - name: Run Pytest
+        env:
+          DATABASE_URL: postgresql+asyncpg://haron:haron_secret@localhost:5432/haron_test
+          REDIS_URL: redis://localhost:6379/1
+          JWT_SECRET_KEY: test_secret_key_minimum_thirty_two_chars_long
+          ENVIRONMENT: testing
+        run: uv run pytest -v
+
+  frontend:
+    name: Frontend Lint & Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build

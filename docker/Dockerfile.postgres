@@ -1,0 +1,4 @@
+FROM postgis/postgis:16-3.4-alpine
+RUN apk add --no-cache postgresql-pgvector && \
+    cp /usr/lib/postgresql16/vector.so $(pg_config --pkglibdir)/ && \
+    cp /usr/share/postgresql16/extension/vector* $(pg_config --sharedir)/extension/

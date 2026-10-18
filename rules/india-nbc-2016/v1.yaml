@@ -1,0 +1,123 @@
+id: "india-nbc-2016"
+name: "National Building Code of India 2016"
+jurisdiction: "India (National Standard)"
+version: "2016.1"
+description: "NBC 2016 Part 3: Development Control Rules and General Building Requirements for residential buildings."
+rules:
+  - id: "nbc-habitable-room-min-area"
+    title: "Minimum Area of Habitable Room"
+    clause: "NBC 2016 Part 3, Clause 4.2.1"
+    category: "room_size"
+    applies_to: "room:habitable"
+    check: "check_room_min_area"
+    params:
+      min_area_sqm: 9.5
+      single_room_min_area_sqm: 9.5
+      multi_room_secondary_min_area_sqm: 7.5
+    severity: "fail"
+    verified: true
+    notes: "No habitable room shall have a floor area of less than 9.5 m2 in a single-room dwelling."
+
+  - id: "nbc-habitable-room-min-width"
+    title: "Minimum Width of Habitable Room"
+    clause: "NBC 2016 Part 3, Clause 4.2.2"
+    category: "width"
+    applies_to: "room:habitable"
+    check: "check_room_min_width"
+    params:
+      min_width_mm: 2400
+      secondary_min_width_mm: 2100
+    severity: "fail"
+    verified: true
+    notes: "The minimum width of a habitable room shall not be less than 2.4 m."
+
+  - id: "nbc-habitable-room-min-height"
+    title: "Minimum Ceiling Height of Habitable Room"
+    clause: "NBC 2016 Part 3, Clause 4.2.3"
+    category: "height"
+    applies_to: "room:habitable"
+    check: "check_room_min_height"
+    params:
+      min_height_mm: 2750
+      ac_room_min_height_mm: 2400
+    severity: "fail"
+    verified: true
+    notes: "Clear height shall be not less than 2.75 m for non-air-conditioned habitable rooms."
+
+  - id: "nbc-kitchen-min-area"
+    title: "Minimum Area of Kitchen"
+    clause: "NBC 2016 Part 3, Clause 4.3.1"
+    category: "room_size"
+    applies_to: "room:kitchen"
+    check: "check_room_min_area"
+    params:
+      min_area_sqm: 5.0
+      with_dining_min_area_sqm: 7.5
+    severity: "fail"
+    verified: true
+    notes: "Area of kitchen where separate dining area is provided shall be not less than 5.0 m2; otherwise 7.5 m2."
+
+  - id: "nbc-kitchen-min-width"
+    title: "Minimum Width of Kitchen"
+    clause: "NBC 2016 Part 3, Clause 4.3.2"
+    category: "width"
+    applies_to: "room:kitchen"
+    check: "check_room_min_width"
+    params:
+      min_width_mm: 1800
+    severity: "fail"
+    verified: true
+    notes: "Minimum width of kitchen shall be 1.8 m."
+
+  - id: "nbc-bathroom-min-area"
+    title: "Minimum Size of Bathroom"
+    clause: "NBC 2016 Part 3, Clause 4.4.1"
+    category: "room_size"
+    applies_to: "room:bathroom"
+    check: "check_room_min_area"
+    params:
+      min_area_sqm: 1.8
+      min_width_mm: 1200
+    severity: "fail"
+    verified: true
+    notes: "The size of a bathroom shall not be less than 1.8 m2 with a minimum width of 1.2 m."
+
+  - id: "nbc-water-closet-min-area"
+    title: "Minimum Size of Water Closet (WC)"
+    clause: "NBC 2016 Part 3, Clause 4.4.2"
+    category: "room_size"
+    applies_to: "room:wc"
+    check: "check_room_min_area"
+    params:
+      min_area_sqm: 1.1
+      min_width_mm: 900
+    severity: "fail"
+    verified: true
+    notes: "The size of a water closet shall not be less than 1.1 m2 with a minimum width of 0.9 m."
+
+  - id: "nbc-residential-stair-width"
+    title: "Minimum Width of Residential Internal Staircase"
+    clause: "NBC 2016 Part 4 / Part 3 Clause 4.17"
+    category: "stair"
+    applies_to: "stair:internal"
+    check: "check_stair_geometry"
+    params:
+      min_width_mm: 1000
+      max_riser_mm: 190
+      min_tread_mm: 250
+      min_headroom_mm: 2200
+    severity: "fail"
+    verified: true
+    notes: "Internal staircase minimum width 1000 mm, maximum riser 190 mm, minimum tread 250 mm."
+
+  - id: "nbc-natural-ventilation-openings"
+    title: "Aggregate Area of Ventilation & Lighting Openings"
+    clause: "NBC 2016 Part 3, Clause 4.19"
+    category: "ventilation"
+    applies_to: "room:habitable"
+    check: "check_ventilation_ratio"
+    params:
+      min_opening_floor_ratio: 0.10
+    severity: "review"
+    verified: true
+    notes: "Aggregate window and door glazed opening shall not be less than 1/10th of total room floor area."

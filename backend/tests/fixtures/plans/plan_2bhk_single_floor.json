@@ -1,0 +1,239 @@
+{
+  "units": "mm",
+  "levels": [
+    {
+      "id": "lvl-ground",
+      "name": "Ground Floor",
+      "elevation_mm": 0,
+      "floor_to_floor_mm": 3000,
+      "rooms": [
+        {
+          "id": "room-living",
+          "type": "living",
+          "name": "Living & Dining",
+          "polygon": [
+            [0, 0],
+            [6000, 0],
+            [6000, 5000],
+            [0, 5000]
+          ]
+        },
+        {
+          "id": "room-kitchen",
+          "type": "kitchen",
+          "name": "Kitchen",
+          "polygon": [
+            [6000, 0],
+            [10000, 0],
+            [10000, 3500],
+            [6000, 3500]
+          ]
+        },
+        {
+          "id": "room-bath",
+          "type": "bathroom",
+          "name": "Common Bath",
+          "polygon": [
+            [6000, 3500],
+            [10000, 3500],
+            [10000, 5000],
+            [6000, 5000]
+          ]
+        },
+        {
+          "id": "room-bed1",
+          "type": "bedroom",
+          "name": "Master Bedroom",
+          "polygon": [
+            [0, 5000],
+            [5000, 5000],
+            [5000, 10000],
+            [0, 10000]
+          ]
+        },
+        {
+          "id": "room-bed2",
+          "type": "bedroom",
+          "name": "Guest Bedroom",
+          "polygon": [
+            [5000, 5000],
+            [10000, 5000],
+            [10000, 10000],
+            [5000, 10000]
+          ]
+        }
+      ],
+      "walls": [
+        {
+          "id": "wall-ext-south-1",
+          "start": [0, 0],
+          "end": [6000, 0],
+          "thickness_mm": 200,
+          "height_mm": 3000,
+          "is_external": true
+        },
+        {
+          "id": "wall-ext-south-2",
+          "start": [6000, 0],
+          "end": [10000, 0],
+          "thickness_mm": 200,
+          "height_mm": 3000,
+          "is_external": true
+        },
+        {
+          "id": "wall-ext-east-1",
+          "start": [10000, 0],
+          "end": [10000, 5000],
+          "thickness_mm": 200,
+          "height_mm": 3000,
+          "is_external": true
+        },
+        {
+          "id": "wall-ext-east-2",
+          "start": [10000, 5000],
+          "end": [10000, 10000],
+          "thickness_mm": 200,
+          "height_mm": 3000,
+          "is_external": true
+        },
+        {
+          "id": "wall-ext-north",
+          "start": [10000, 10000],
+          "end": [0, 10000],
+          "thickness_mm": 200,
+          "height_mm": 3000,
+          "is_external": true
+        },
+        {
+          "id": "wall-ext-west",
+          "start": [0, 10000],
+          "end": [0, 0],
+          "thickness_mm": 200,
+          "height_mm": 3000,
+          "is_external": true
+        },
+        {
+          "id": "wall-int-h-mid",
+          "start": [0, 5000],
+          "end": [10000, 5000],
+          "thickness_mm": 100,
+          "height_mm": 3000,
+          "is_external": false
+        },
+        {
+          "id": "wall-int-v-mid",
+          "start": [5000, 5000],
+          "end": [5000, 10000],
+          "thickness_mm": 100,
+          "height_mm": 3000,
+          "is_external": false
+        },
+        {
+          "id": "wall-int-v-kitchen",
+          "start": [6000, 0],
+          "end": [6000, 5000],
+          "thickness_mm": 100,
+          "height_mm": 3000,
+          "is_external": false
+        },
+        {
+          "id": "wall-int-h-bath",
+          "start": [6000, 3500],
+          "end": [10000, 3500],
+          "thickness_mm": 100,
+          "height_mm": 3000,
+          "is_external": false
+        }
+      ],
+      "openings": [
+        {
+          "id": "open-main-door",
+          "wall_id": "wall-ext-south-1",
+          "kind": "door",
+          "offset_mm": 1000,
+          "width_mm": 1000,
+          "height_mm": 2100,
+          "sill_mm": 0,
+          "swing": "inward_right"
+        },
+        {
+          "id": "open-living-window",
+          "wall_id": "wall-ext-south-1",
+          "kind": "window",
+          "offset_mm": 2500,
+          "width_mm": 2600,
+          "height_mm": 1500,
+          "sill_mm": 900
+        },
+        {
+          "id": "open-kitchen-door",
+          "wall_id": "wall-int-v-kitchen",
+          "kind": "door",
+          "offset_mm": 1000,
+          "width_mm": 900,
+          "height_mm": 2100,
+          "sill_mm": 0,
+          "swing": "inward_left"
+        },
+        {
+          "id": "open-kitchen-window",
+          "wall_id": "wall-ext-east-1",
+          "kind": "window",
+          "offset_mm": 1000,
+          "width_mm": 1500,
+          "height_mm": 1200,
+          "sill_mm": 1000
+        },
+        {
+          "id": "open-bath-door",
+          "wall_id": "wall-int-v-kitchen",
+          "kind": "door",
+          "offset_mm": 3800,
+          "width_mm": 800,
+          "height_mm": 2100,
+          "sill_mm": 0,
+          "swing": "inward_left"
+        },
+        {
+          "id": "open-bed1-door",
+          "wall_id": "wall-int-h-mid",
+          "kind": "door",
+          "offset_mm": 1500,
+          "width_mm": 900,
+          "height_mm": 2100,
+          "sill_mm": 0,
+          "swing": "inward_left"
+        },
+        {
+          "id": "open-bed1-window",
+          "wall_id": "wall-ext-north",
+          "kind": "window",
+          "offset_mm": 6500,
+          "width_mm": 2200,
+          "height_mm": 1500,
+          "sill_mm": 900
+        },
+        {
+          "id": "open-bed2-door",
+          "wall_id": "wall-int-h-mid",
+          "kind": "door",
+          "offset_mm": 7000,
+          "width_mm": 900,
+          "height_mm": 2100,
+          "sill_mm": 0,
+          "swing": "inward_right"
+        },
+        {
+          "id": "open-bed2-window",
+          "wall_id": "wall-ext-north",
+          "kind": "window",
+          "offset_mm": 1500,
+          "width_mm": 2200,
+          "height_mm": 1500,
+          "sill_mm": 900
+        }
+      ],
+      "stairs": []
+    }
+  ]
+}

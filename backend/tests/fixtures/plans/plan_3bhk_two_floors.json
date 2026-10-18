@@ -1,0 +1,178 @@
+{
+  "units": "mm",
+  "levels": [
+    {
+      "id": "lvl-ground",
+      "name": "Ground Level",
+      "elevation_mm": 0,
+      "floor_to_floor_mm": 3200,
+      "rooms": [
+        {
+          "id": "room-g-living",
+          "type": "living",
+          "name": "Grand Foyer & Living",
+          "polygon": [
+            [0, 0],
+            [7000, 0],
+            [7000, 6000],
+            [0, 6000]
+          ]
+        },
+        {
+          "id": "room-g-kitchen",
+          "type": "kitchen",
+          "name": "Gourmet Kitchen",
+          "polygon": [
+            [7000, 0],
+            [12000, 0],
+            [12000, 4000],
+            [7000, 4000]
+          ]
+        },
+        {
+          "id": "room-g-powder",
+          "type": "bathroom",
+          "name": "Powder Room",
+          "polygon": [
+            [7000, 4000],
+            [9500, 4000],
+            [9500, 6000],
+            [7000, 6000]
+          ]
+        },
+        {
+          "id": "room-g-stairwell",
+          "type": "corridor",
+          "name": "Stairwell Hall",
+          "polygon": [
+            [9500, 4000],
+            [12000, 4000],
+            [12000, 6000],
+            [9500, 6000]
+          ]
+        },
+        {
+          "id": "room-g-bed1",
+          "type": "bedroom",
+          "name": "Guest Suite",
+          "polygon": [
+            [0, 6000],
+            [6000, 6000],
+            [6000, 11000],
+            [0, 11000]
+          ]
+        }
+      ],
+      "walls": [
+        {
+          "id": "wall-g-south",
+          "start": [0, 0],
+          "end": [12000, 0],
+          "thickness_mm": 230,
+          "height_mm": 3200,
+          "is_external": true
+        },
+        {
+          "id": "wall-g-east",
+          "start": [12000, 0],
+          "end": [12000, 6000],
+          "thickness_mm": 230,
+          "height_mm": 3200,
+          "is_external": true
+        },
+        {
+          "id": "wall-g-north",
+          "start": [12000, 6000],
+          "end": [0, 6000],
+          "thickness_mm": 115,
+          "height_mm": 3200,
+          "is_external": false
+        },
+        {
+          "id": "wall-g-west",
+          "start": [0, 6000],
+          "end": [0, 0],
+          "thickness_mm": 230,
+          "height_mm": 3200,
+          "is_external": true
+        }
+      ],
+      "openings": [
+        {
+          "id": "open-g-main-door",
+          "wall_id": "wall-g-south",
+          "kind": "door",
+          "offset_mm": 1500,
+          "width_mm": 1100,
+          "height_mm": 2400,
+          "sill_mm": 0,
+          "swing": "inward_right"
+        }
+      ],
+      "stairs": [
+        {
+          "id": "stair-main",
+          "polygon": [
+            [9500, 4000],
+            [12000, 4000],
+            [12000, 6000],
+            [9500, 6000]
+          ],
+          "riser_mm": 160,
+          "tread_mm": 280,
+          "direction": "up"
+        }
+      ]
+    },
+    {
+      "id": "lvl-first",
+      "name": "First Floor",
+      "elevation_mm": 3200,
+      "floor_to_floor_mm": 3000,
+      "rooms": [
+        {
+          "id": "room-f-master",
+          "type": "bedroom",
+          "name": "Master Suite",
+          "polygon": [
+            [0, 0],
+            [6000, 0],
+            [6000, 6000],
+            [0, 6000]
+          ]
+        },
+        {
+          "id": "room-f-bed2",
+          "type": "bedroom",
+          "name": "Kids Bedroom",
+          "polygon": [
+            [6000, 0],
+            [12000, 0],
+            [12000, 6000],
+            [6000, 6000]
+          ]
+        }
+      ],
+      "walls": [
+        {
+          "id": "wall-f-south",
+          "start": [0, 0],
+          "end": [12000, 0],
+          "thickness_mm": 230,
+          "height_mm": 3000,
+          "is_external": true
+        },
+        {
+          "id": "wall-f-mid",
+          "start": [6000, 0],
+          "end": [6000, 6000],
+          "thickness_mm": 115,
+          "height_mm": 3000,
+          "is_external": false
+        }
+      ],
+      "openings": [],
+      "stairs": []
+    }
+  ]
+}

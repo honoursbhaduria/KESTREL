@@ -4,10 +4,34 @@ dist
 .tanstack
 .vinxi
 src/routeTree.gen.ts
-
-# Scraped reference material (local research only, never shipped)
-reference/
-
-# Local screenshots
-image.png
 .vercel
+
+# Environment variables
+.env
+.env.*
+.env.local
+!.env.example
+
+# Reference repos (local research only, never shipped)
+reference/
+references/
+
+# Local screenshots & images
+image.png
+screenshot_*.png
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.venv/
+env/
+venv/
+*.egg-info/
+build/
+
