@@ -111,10 +111,6 @@ export const PlanViewer3D: React.FC<PlanViewer3DProps> = ({
   useEffect(() => {
     if (!modelRootRef.current) return
 
-    const failingIds = new Set(
-      issues.filter((i) => i.status === 'fail').map((i) => i.id)
-    )
-
     modelRootRef.current.traverse((child) => {
       if (child instanceof THREE.Mesh) {
         const meshName = child.name || ''

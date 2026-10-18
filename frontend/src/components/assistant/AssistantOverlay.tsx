@@ -175,7 +175,7 @@ export const AssistantOverlay: React.FC<AssistantOverlayProps> = ({
   const handleSkip = async (fix: FixProposal) => {
     setActionError(null)
     try {
-      const skipped = await api.skipFix(fix.id)
+      await api.skipFix(fix.id)
       if (activePreview?.fix.id === fix.id) {
         onPreviewFix(null)
       }
