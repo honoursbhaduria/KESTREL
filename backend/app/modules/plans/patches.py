@@ -280,6 +280,29 @@ class MergeRoomsPatch(BasePatch):
         return PlanData.model_validate(plan_dict)
 
 
+class SetRoomPolygonPatch(BasePatch):
+    """Update geometric polygon boundary of a room."""
+
+    type: Literal["set_room_polygon"] = "set_room_polygon"
+    room_id: str
+    polygon: list[list[float]]
+
+    def apply(self, plan: PlanData) -> PlanData:
+        plan_dict = plan.model_dump()
+        found = False
+        for level in plan_dict["levels"]:
+            for r in level["rooms"]:
+                if r["id"] == self.room_id:
+                    r["polygon"] = self.polygon
+                    found = True
+                    break
+            if found:
+                break
+        if not found:
+            raise ValueError(f"Room '{self.room_id}' not found.")
+        return PlanData.model_validate(plan_dict)
+
+
 # Patch dispatcher
 PATCH_DISPATCHER: dict[str, type[BasePatch]] = {
     "move_wall": MoveWallPatch,
@@ -292,16 +315,19 @@ PATCH_DISPATCHER: dict[str, type[BasePatch]] = {
     "rename_room": RenameRoomPatch,
     "split_room": SplitRoomPatch,
     "merge_rooms": MergeRoomsPatch,
+    "set_room_polygon": SetRoomPolygonPatch,
 }
 
 
 def parse_patch(patch_dict: dict[str, Any]) -> BasePatch:
     """Parse raw patch dictionary into concrete typed patch model."""
-    ptype = patch_dict.get("type")
+    d = dict(patch_dict)
+    ptype = d.get("type") or d.get("op")
+    d["type"] = ptype
     patch_cls = PATCH_DISPATCHER.get(ptype or "")
     if not patch_cls:
         raise ValueError(f"Unsupported patch operation type: '{ptype}'")
-    return patch_cls.model_validate(patch_dict)
+    return patch_cls.model_validate(d)
 
 
 def apply_patches(plan: PlanData, patches: Sequence[dict[str, Any] | BasePatch]) -> PlanData:

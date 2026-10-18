@@ -92,7 +92,14 @@ async function run() {
     }
   }
 
-  // 6. Capture loaded scheme in 2D workspace
+  // 6. Trigger review and capture loaded scheme in 2D workspace
+  console.log('Triggering statutory review on loaded scheme in workspace...')
+  const runReviewBtn = await page.$('button:has-text("Run Statutory Review")')
+  if (runReviewBtn) {
+    await runReviewBtn.click()
+    await page.waitForTimeout(2000)
+  }
+
   console.log('Capturing synthesized scheme loaded in 2D Workspace...')
   await page.screenshot({ path: `${artifactDir}/screenshot_phase4_workspace_scheme.png`, fullPage: false })
 

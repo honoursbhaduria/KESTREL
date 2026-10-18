@@ -8,7 +8,8 @@ from fastapi import APIRouter, Depends, Response, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sse_starlette.sse import EventSourceResponse
 
-from app.db.session import async_session_factory, get_db_session
+import app.db.session as db_session_module
+from app.db.session import get_db_session
 from app.modules.auth.dependencies import AuthContext, get_current_auth_context
 from app.modules.jobs.models import JobStatus
 from app.modules.jobs.repository import JobRepository
@@ -57,7 +58,7 @@ async def stream_job_events(
         last_status = None
 
         while True:
-            async with async_session_factory() as poll_session:
+            async with db_session_module.async_session_factory() as poll_session:
                 repo = JobRepository(poll_session)
                 job = await repo.get_by_id(job_id, auth.org.id)
                 if not job:

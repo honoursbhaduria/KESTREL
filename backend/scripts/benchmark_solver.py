@@ -2,9 +2,8 @@
 Target: Generation job finishes under 30s for a 2-floor 4BHK.
 """
 
-import time
 import sys
-from shapely.geometry import Polygon
+import time
 
 from app.modules.planning.envelope import Envelope
 from app.modules.planning.program import Adjacency, Preferences, Program, RoomProgram

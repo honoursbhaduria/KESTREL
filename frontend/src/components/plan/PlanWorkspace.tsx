@@ -74,8 +74,22 @@ export const PlanWorkspace: React.FC<PlanWorkspaceProps> = ({
     try {
       setLoading(true)
       try {
-        const targetId = initialPlanId || projectId
-        const storedPlan = await api.getPlan(targetId)
+        let storedPlan: Plan | null = null
+        if (initialPlanId) {
+          storedPlan = await api.getPlan(initialPlanId)
+        } else {
+          try {
+            const gen = await api.listGeneratedOptions(projectId)
+            if (gen.options && gen.options.length > 0) {
+              storedPlan = await api.getPlan(gen.options[0].id)
+            }
+          } catch {
+            // ignore
+          }
+          if (!storedPlan) {
+            storedPlan = await api.getPlan(projectId)
+          }
+        }
         setPlan(storedPlan)
       } catch {
         const newPlan = await api.createPlan(projectId, {
@@ -98,7 +112,7 @@ export const PlanWorkspace: React.FC<PlanWorkspaceProps> = ({
     } finally {
       setLoading(false)
     }
-  }, [projectId])
+  }, [projectId, initialPlanId])
 
   useEffect(() => {
     loadPlan()
@@ -481,6 +495,18 @@ export const PlanWorkspace: React.FC<PlanWorkspaceProps> = ({
 
   const scale = 0.04
 
+  // Auto-center pan when active level changes or plan bounds update
+  useEffect(() => {
+    if (planBounds && planBounds.width > 0 && planBounds.height > 0) {
+      const cx = ((planBounds.minX + planBounds.maxX) / 2) * scale
+      const cy = ((planBounds.minY + planBounds.maxY) / 2) * scale
+      setPan({
+        x: Math.round(360 - cx * zoom),
+        y: Math.round(270 - cy * zoom),
+      })
+    }
+  }, [plan?.id, currentLevelIdx, planBounds.minX, planBounds.minY, planBounds.maxX, planBounds.maxY])
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -630,7 +656,16 @@ export const PlanWorkspace: React.FC<PlanWorkspaceProps> = ({
                 type="button"
                 onClick={() => {
                   setZoom(1.0)
-                  setPan({ x: 100, y: 70 })
+                  if (planBounds && planBounds.width > 0) {
+                    const cx = ((planBounds.minX + planBounds.maxX) / 2) * scale
+                    const cy = ((planBounds.minY + planBounds.maxY) / 2) * scale
+                    setPan({
+                      x: Math.round(360 - cx),
+                      y: Math.round(270 - cy),
+                    })
+                  } else {
+                    setPan({ x: 100, y: 70 })
+                  }
                 }}
                 className="px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider border border-[var(--line)] hover:bg-[var(--line)]"
                 title="Reset View"

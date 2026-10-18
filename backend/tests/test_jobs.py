@@ -104,7 +104,7 @@ async def test_job_sse_events(client: AsyncClient, auth_org_a: dict):
         await asyncio.sleep(0.1)
         await process_dummy_job({}, job_id, steps=1)
 
-    asyncio.create_task(finish_job_delayed())
+    bg_task = asyncio.create_task(finish_job_delayed())
 
     # Stream events
     async with client.stream(
@@ -121,3 +121,5 @@ async def test_job_sse_events(client: AsyncClient, auth_org_a: dict):
             if len(received_data) >= 1:
                 break
         assert len(received_data) >= 1
+
+    await bg_task

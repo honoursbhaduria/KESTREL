@@ -586,8 +586,63 @@ class ApiClient {
     })
   }
 
+  public getAccessToken(): string | null {
+    return this.accessToken
+  }
+
   public async listGeneratedOptions(projectId: string): Promise<GeneratedOptionsResponse> {
     return this.request<GeneratedOptionsResponse>(`/api/v1/projects/${projectId}/generated-options`)
+  }
+
+  // -----------------------------------------------------------
+  // Phase 5: Review Assistant & 3D Model
+  // -----------------------------------------------------------
+  public async askAssistant(
+    planId: string,
+    message: string,
+    conversationId?: string
+  ): Promise<AssistantTurnResponse> {
+    return this.request<AssistantTurnResponse>(`/api/v1/plans/${planId}/assistant`, {
+      method: 'POST',
+      body: JSON.stringify({
+        message,
+        conversation_id: conversationId || null,
+      }),
+    })
+  }
+
+  public async previewFix(fixId: string): Promise<FixPreviewResponse> {
+    return this.request<FixPreviewResponse>(`/api/v1/fixes/${fixId}/preview`, {
+      method: 'POST',
+    })
+  }
+
+  public async applyFix(fixId: string): Promise<FixApplyResponse> {
+    return this.request<FixApplyResponse>(`/api/v1/fixes/${fixId}/apply`, {
+      method: 'POST',
+    })
+  }
+
+  public async skipFix(fixId: string): Promise<FixProposal> {
+    return this.request<FixProposal>(`/api/v1/fixes/${fixId}/skip`, {
+      method: 'POST',
+    })
+  }
+
+  public async listFixes(planId: string): Promise<FixProposal[]> {
+    return this.request<FixProposal[]>(`/api/v1/plans/${planId}/fixes`)
+  }
+
+  public async getPlanGlbBuffer(planId: string, version: number): Promise<ArrayBuffer> {
+    const token = this.accessToken
+    const url = `${API_BASE_URL}/api/v1/plans/${planId}/versions/${version}/model.glb`
+    const res = await fetch(url, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+    if (!res.ok) {
+      throw new Error(`Failed to load 3D model: HTTP ${res.status}`)
+    }
+    return res.arrayBuffer()
   }
 }
 
@@ -680,6 +735,58 @@ export interface GeneratedOptionsResponse {
 export interface GenerateJobResponse {
   job_id: string
   status: string
+}
+
+export interface FixDiffItem {
+  id: string
+  rule_id: string
+  title: string
+  message?: string
+  status?: string
+  status_before?: string
+  status_after?: string
+  description?: string
+}
+
+export interface FixDiffSummary {
+  resolved: FixDiffItem[]
+  introduced: FixDiffItem[]
+  unchanged: FixDiffItem[]
+}
+
+export interface FixProposal {
+  id: string
+  plan_id: string
+  conversation_id?: string | null
+  status: 'proposed' | 'applied' | 'skipped'
+  rationale: string
+  rule_id: string
+  clause?: string | null
+  patch_ops: Record<string, unknown>[]
+  diff_summary: FixDiffSummary
+  introduced_fails: number
+  applied_version?: number | null
+  created_at: string
+}
+
+export interface FixPreviewResponse {
+  fix: FixProposal
+  patched_plan: PlanData
+  diff_summary: FixDiffSummary
+}
+
+export interface FixApplyResponse {
+  fix: FixProposal
+  status: 'applied'
+  new_version: number
+  plan_id: string
+}
+
+export interface AssistantTurnResponse {
+  conversation_id: string
+  reply: string
+  tools_used: string[]
+  proposed_fix?: FixProposal | null
 }
 
 export const api = new ApiClient()

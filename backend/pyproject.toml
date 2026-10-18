@@ -64,6 +64,9 @@ asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "session"
 testpaths = ["tests"]
 pythonpath = ["."]
+markers = [
+    "eval: assistant evaluation suite",
+]
 
 [tool.mypy]
 python_version = "3.12"

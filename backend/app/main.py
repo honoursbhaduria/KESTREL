@@ -8,7 +8,9 @@ from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from app.core.config import get_settings
 from app.core.errors import register_error_handlers
 from app.core.logging import setup_logging
+from app.modules.assistant.router import router as assistant_router
 from app.modules.auth.router import router as auth_router
+from app.modules.exports.router import router as exports_router
 from app.modules.jobs.router import router as jobs_router
 from app.modules.plans.router import router as plans_router
 from app.modules.projects.router import router as projects_router
@@ -46,6 +48,8 @@ app.include_router(projects_router, prefix="/api/v1")
 app.include_router(plans_router, prefix="/api/v1")
 app.include_router(rules_router, prefix="/api/v1")
 app.include_router(jobs_router, prefix="/api/v1")
+app.include_router(assistant_router, prefix="/api/v1")
+app.include_router(exports_router, prefix="/api/v1")
 
 
 @app.get("/metrics", tags=["system"])
